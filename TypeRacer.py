@@ -55,3 +55,8 @@ class TypeRacer:
         plt.plot(self.attempt, self.accuracy)
         plt.title("accuracy")
         plt.show()
+        
+    def download(self, path):
+        with open(path, "w") as f:
+            for attempt, wpm, accuracy, score, place, date in zip(self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date):
+                f.write(f"{attempt};{wpm};{accuracy};{score};{place};{date}\n")
