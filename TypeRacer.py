@@ -61,12 +61,11 @@ class TypeRacer:
                     pb.append([attempt, wpm])
                     pb_wpm = wpm
                     plt.axhline(y=wpm, color="black", linestyle="--", label="PB Line", linewidth=1, xmin=attempt/len(self.attempt))
-                    plt.annotate(wpm, xy=(attempt, wpm), xytext=(len(self.attempt) + 1, wpm))
 
             plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
 
             ax2 = plt.gca().secondary_yaxis('right')
-            ax2.set_yticks([])
+            ax2.set_yticks(list(map(lambda x: x[1], pb)))
             plt.subplots_adjust(right=0.85)
             ax2.set_ylabel("PB Speed (WPM)", rotation=270, labelpad=30, ha='center', va='center_baseline',
                            multialignment='center')
