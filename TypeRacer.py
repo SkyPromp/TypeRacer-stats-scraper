@@ -46,8 +46,23 @@ class TypeRacer:
     def getAll(self):
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
-    def plotWPM(self):
-        plt.plot(self.attempt, self.wpm)
+    def plotWPM(self, pb_on=False):
+        plt.plot(self.attempt, self.wpm, label="wpm")
+
+        if pb_on:
+            pb_wpm = 0
+            pb = []
+
+            for attempt, wpm in reversed(list(zip(self.attempt, self.wpm))):
+                if wpm > pb_wpm:
+                    pb.append([attempt, wpm])
+                    pb_wpm = wpm
+                    plt.axhline(y=wpm, color="black", linestyle="--", label="PB Line", linewidth=1)
+                    plt.annotate(f'{wpm} WPM', xy=(attempt, wpm), xytext=(attempt, wpm),
+                                 arrowprops=dict(facecolor='black', arrowstyle='->'))
+
+            plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
+
         plt.title("WPM")
         plt.show()
 
