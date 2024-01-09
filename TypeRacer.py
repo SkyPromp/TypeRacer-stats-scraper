@@ -49,6 +49,9 @@ class TypeRacer:
     def plotWPM(self, pb_on=False, denoising_line=0):
         plt.plot(self.attempt, self.wpm, label="wpm")
 
+        plt.ylabel("Speed (WPM)")
+        plt.xlabel("Amount of races")
+
         if pb_on:
             pb_wpm = 0
             pb = []
@@ -58,9 +61,15 @@ class TypeRacer:
                     pb.append([attempt, wpm])
                     pb_wpm = wpm
                     plt.axhline(y=wpm, color="black", linestyle="--", label="PB Line", linewidth=1, xmin=attempt/len(self.attempt))
-                    plt.annotate(f'{wpm} WPM', xy=(attempt, wpm), xytext=(len(self.attempt) + 1, wpm))
+                    plt.annotate(wpm, xy=(attempt, wpm), xytext=(len(self.attempt) + 1, wpm))
 
             plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
+
+            ax2 = plt.gca().secondary_yaxis('right')
+            ax2.set_yticks([])
+            plt.subplots_adjust(right=0.85)
+            ax2.set_ylabel("PB Speed (WPM)", rotation=270, labelpad=30, ha='center', va='center_baseline',
+                           multialignment='center')
 
         if denoising_line > 0:
             local_points = []
@@ -78,6 +87,7 @@ class TypeRacer:
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
 
         plt.xlim(0, max(self.attempt))
+
         plt.title("WPM")
         plt.show()
 
