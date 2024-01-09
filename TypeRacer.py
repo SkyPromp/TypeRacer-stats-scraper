@@ -66,9 +66,25 @@ class TypeRacer:
         plt.title("WPM")
         plt.show()
 
-    def plotAccuracy(self):
+    def plotAccuracy(self, denoising_line=0):
         plt.plot(self.attempt, self.accuracy)
-        plt.title("accuracy")
+
+        if denoising_line > 0:
+            local_points = []
+            points = []
+
+            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
+
+            for attempt, accuracy in list(reversed(list(zip(self.attempt, self.accuracy))))[1:]:
+                local_points.append([attempt, accuracy])
+                if len(local_points) > denoising_line:
+                    local_points.pop(0)
+
+                points.append([attempt, average(local_points)])
+
+            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
+
+        plt.title("Accuracy")
         plt.show()
         
     def download(self, path):
