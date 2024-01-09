@@ -67,7 +67,7 @@ class TypeRacer:
             ax2 = plt.gca().secondary_yaxis('right')
             ax2.set_yticks(list(map(lambda x: x[1], pb)))
             plt.subplots_adjust(right=0.85)
-            ax2.set_ylabel("PB Speed (WPM)", rotation=270, labelpad=30, ha='center', va='center_baseline',
+            ax2.set_ylabel("PB Speed (WPM)", rotation=270, labelpad=10, ha='center', va='center_baseline',
                            multialignment='center')
 
         if denoising_line > 0:
