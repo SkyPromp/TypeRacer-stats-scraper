@@ -88,11 +88,14 @@ class TypeRacer:
 
         plt.xlim(0, max(self.attempt))
 
-        plt.title("WPM")
+        plt.title("Typing Speed")
         plt.show()
 
     def plotAccuracy(self, denoising_line=0):
         plt.plot(self.attempt, self.accuracy)
+
+        plt.ylabel("Accuracy")
+        plt.xlabel("Amount of races")
 
         if denoising_line > 0:
             local_points = []
@@ -110,7 +113,7 @@ class TypeRacer:
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
 
         plt.xlim(0, max(self.attempt))
-        plt.title("Accuracy")
+        plt.title("Typing Accuracy")
         plt.show()
         
     def download(self, path):
