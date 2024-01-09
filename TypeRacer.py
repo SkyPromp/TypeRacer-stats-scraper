@@ -46,7 +46,7 @@ class TypeRacer:
     def getAll(self):
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
-    def plotWPM(self, pb_on=False):
+    def plotWPM(self, pb_on=False, denoising_line=0):
         plt.plot(self.attempt, self.wpm, label="wpm")
 
         if pb_on:
@@ -57,12 +57,27 @@ class TypeRacer:
                 if wpm > pb_wpm:
                     pb.append([attempt, wpm])
                     pb_wpm = wpm
-                    plt.axhline(y=wpm, color="black", linestyle="--", label="PB Line", linewidth=1)
-                    plt.annotate(f'{wpm} WPM', xy=(attempt, wpm), xytext=(attempt, wpm),
-                                 arrowprops=dict(facecolor='black', arrowstyle='->'))
+                    plt.axhline(y=wpm, color="black", linestyle="--", label="PB Line", linewidth=1, xmin=attempt/len(self.attempt))
+                    plt.annotate(f'{wpm} WPM', xy=(attempt, wpm), xytext=(len(self.attempt) + 1, wpm))
 
             plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
 
+        if denoising_line > 0:
+            local_points = []
+            points = []
+
+            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
+
+            for attempt, wpm in list(reversed(list(zip(self.attempt, self.wpm))))[1:]:
+                local_points.append([attempt, wpm])
+                if len(local_points) > denoising_line:
+                    local_points.pop(0)
+
+                points.append([attempt, average(local_points)])
+
+            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
+
+        plt.xlim(0, max(self.attempt))
         plt.title("WPM")
         plt.show()
 
@@ -84,6 +99,7 @@ class TypeRacer:
 
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
 
+        plt.xlim(0, max(self.attempt))
         plt.title("Accuracy")
         plt.show()
         
