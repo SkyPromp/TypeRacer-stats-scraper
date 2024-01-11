@@ -93,7 +93,7 @@ class TypeRacer:
         plt.show()
 
     def plotAccuracy(self, denoising_line=0):
-        plt.plot(self.attempt, self.accuracy, label="wpm")
+        plt.plot(self.attempt, self.accuracy, label="accuracy")
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
