@@ -85,7 +85,7 @@ class TypeRacer:
 
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
 
-        plt.xlim(0, max(self.attempt))
+        plt.xlim(1, max(self.attempt))
 
         plt.legend()
 
@@ -113,7 +113,7 @@ class TypeRacer:
 
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
 
-        plt.xlim(0, max(self.attempt))
+        plt.xlim(1, max(self.attempt))
         plt.legend()
         plt.title("Typing Accuracy")
         plt.show()
