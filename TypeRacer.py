@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class TypeRacer:
@@ -90,6 +91,21 @@ class TypeRacer:
         plt.legend()
 
         plt.title("Typing Speed")
+        plt.show()
+
+    def histWPM(self):
+        unique_values, counts = np.unique(self.wpm, return_counts=True)
+        sorted_indices = np.argsort(unique_values)
+        unique_values = unique_values[sorted_indices]
+        counts = counts[sorted_indices]
+
+        plt.bar(unique_values, counts)
+
+        plt.title("Typing test speed distribution")
+        plt.xlabel("Speed (WPM)")
+        plt.ylabel("Amount of races")
+        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / 6))))
+
         plt.show()
 
     def plotAccuracy(self, denoising_line=0):
