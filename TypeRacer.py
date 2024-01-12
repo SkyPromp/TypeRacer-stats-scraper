@@ -47,7 +47,7 @@ class TypeRacer:
     def getAll(self):
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
-    def plotWPM(self, pb_on: bool = False, denoising_line: int = 0):
+    def plotWPM(self, pb_on: bool = False, denoising_line: int = 0, average_on: bool = False):
         plt.plot(self.attempt, self.wpm, label="wpm")
 
         plt.ylabel("Speed (WPM)")
@@ -86,6 +86,18 @@ class TypeRacer:
 
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
 
+        if average_on:
+            local_points = []
+            points = []
+
+            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
+
+            for attempt, wpm in list(reversed(list(zip(self.attempt, self.wpm))))[1:]:
+                local_points.append([attempt, wpm])
+                points.append([attempt, average(local_points)])
+
+            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="fuchsia", label="average", linewidth=1)
+
         plt.xlim(1, max(self.attempt))
 
         plt.legend()
@@ -108,7 +120,7 @@ class TypeRacer:
 
         plt.show()
 
-    def plotAccuracy(self, denoising_line: int = 0):
+    def plotAccuracy(self, denoising_line: int = 0, average_on: bool = False):
         plt.plot(self.attempt, self.accuracy, label="accuracy")
 
         plt.ylabel("Accuracy")
@@ -128,6 +140,19 @@ class TypeRacer:
                 points.append([attempt, average(local_points)])
 
             plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
+
+        if average_on:
+            local_points = []
+            points = []
+
+            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
+
+            for attempt, accuracy in list(reversed(list(zip(self.attempt, self.accuracy))))[1:]:
+                local_points.append([attempt, accuracy])
+                points.append([attempt, average(local_points)])
+
+            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="fuchsia", label="average", linewidth=1)
+
 
         plt.xlim(1, max(self.attempt))
         plt.legend()
