@@ -54,50 +54,12 @@ class TypeRacer:
         plt.xlabel("Amount of races")
 
         if pb_on:
-            pb_wpm = 0
-            pb = []
-
-            for attempt, wpm in reversed(list(zip(self.attempt, self.wpm))):
-                if wpm > pb_wpm:
-                    pb.append([attempt, wpm])
-                    pb_wpm = wpm
-                    plt.axhline(y=wpm, color="black", linestyle="--", linewidth=1, xmin=attempt/len(self.attempt))
-
-            plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
-
-            ax2 = plt.gca().secondary_yaxis('right')
-            ax2.set_yticks(list(map(lambda x: x[1], pb)))
-            plt.subplots_adjust(right=0.85)
-            ax2.set_ylabel("PB Speed (WPM)", rotation=270, labelpad=10, ha='center', va='center_baseline',
-                           multialignment='center')
+            self._pbGradual(self.wpm, label="PB Speeds (WPM)")
 
         if denoising_line > 0:
-            local_points = []
-            points = []
-
-            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
-
-            for attempt, wpm in list(reversed(list(zip(self.attempt, self.wpm))))[1:]:
-                local_points.append([attempt, wpm])
-                if len(local_points) > denoising_line:
-                    local_points.pop(0)
-
-                points.append([attempt, average(local_points)])
-
-            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
-
+            self._plotSmooth(self.wpm, denoising_line)
         if average_on:
-            local_points = []
-            points = []
-
-            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
-
-            for attempt, wpm in list(reversed(list(zip(self.attempt, self.wpm))))[1:]:
-                local_points.append([attempt, wpm])
-                points.append([attempt, average(local_points)])
-
-            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="fuchsia", label="average", linewidth=1)
-
+            self._plotAverage(self.wpm)
         plt.xlim(1, max(self.attempt))
 
         plt.legend()
@@ -127,37 +89,52 @@ class TypeRacer:
         plt.xlabel("Amount of races")
 
         if denoising_line > 0:
-            local_points = []
-            points = []
-
-            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
-
-            for attempt, accuracy in list(reversed(list(zip(self.attempt, self.accuracy))))[1:]:
-                local_points.append([attempt, accuracy])
-                if len(local_points) > denoising_line:
-                    local_points.pop(0)
-
-                points.append([attempt, average(local_points)])
-
-            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="black", label="smooth", linewidth=1)
-
+            self._plotSmooth(denoising_line)
         if average_on:
-            local_points = []
-            points = []
-
-            average = lambda x: sum(map(lambda y: y[1], x))/len(x)
-
-            for attempt, accuracy in list(reversed(list(zip(self.attempt, self.accuracy))))[1:]:
-                local_points.append([attempt, accuracy])
-                points.append([attempt, average(local_points)])
-
-            plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="fuchsia", label="average", linewidth=1)
-
+            self._plotAverage(self.accuracy)
 
         plt.xlim(1, max(self.attempt))
         plt.legend()
         plt.title("Typing Accuracy")
         plt.show()
+
+    @staticmethod
+    def _average(data):
+        return sum(map(lambda y: y[1], data))/len(data)
+
+    def _plotSmooth(self, data_source, denoising_line: int = 10):
+        local_points = []
+        points = []
+
+        for attempt, data in list(reversed(list(zip(self.attempt, data_source))))[1:]:
+            local_points.append([attempt, data])
+            if len(local_points) > denoising_line:
+                local_points.pop(0)
+
+            points.append([attempt, TypeRacer._average(local_points)])
+
+        plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label="smooth", linewidth=1)
+
+    def _plotAverage(self, data):
+        self._plotSmooth(data, len(data))
+
+    def _pbGradual(self, data_source, label: str = "PB"):
+        pb_score = 0
+        pb = []
+
+        for attempt, data in reversed(list(zip(self.attempt, data_source))):
+            if data > pb_score:
+                pb.append([attempt, data])
+                pb_score = data
+                plt.axhline(y=data, color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
+
+        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
+
+        ax2 = plt.gca().secondary_yaxis('right')
+        ax2.set_yticks(list(map(lambda x: x[1], pb)))
+        plt.subplots_adjust(right=0.85)
+        ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
+                       multialignment='center')
 
     def histAccuracy(self):
         rounded = list(map(lambda x: round(x, 2), self.accuracy))
