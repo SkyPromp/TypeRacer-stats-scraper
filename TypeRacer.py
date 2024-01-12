@@ -145,7 +145,7 @@ class TypeRacer:
         plt.title("Typing test accuracy distribution")
         plt.xlabel("Accuracy")
         plt.ylabel("Amount of races")
-        plt.xticks(bins)
+        plt.xticks(bins + 0.005, [f"{value:.2f}" for value in bins])
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / 6))))
 
         plt.show()
