@@ -7,18 +7,18 @@ import numpy as np
 class TypeRacer:
     def __init__(self, username: str):
         html = requests.get(f"https://data.typeracer.com/pit/race_history?user={username}&n=2147483647&startDate=&universe=").text
-        data = BeautifulSoup(html, 'lxml')
-        del html
-        jobs = data.find_all('div', class_="Scores__Table__Row")
-        del data
+        data = (BeautifulSoup(html, 'lxml')
+                .find_all('div', class_="Scores__Table__Row"))
+
         self.wpm = []
         self.accuracy = []
         self.attempt = []
         self.score = []
         self.place = []
         self.date = []
-        for job in jobs:
-            attempt, wpm, accuracy, score, place, date = [i.strip() for i in job.text.strip().split("\n") if i.strip()]
+
+        for item in data:
+            attempt, wpm, accuracy, score, place, date = [i.strip() for i in item.text.strip().split("\n") if i.strip()]
             self.wpm.append(int(wpm.split(" ")[0]))
             self.accuracy.append((round(float(accuracy.replace("%", ""))/100, 3)))
             self.attempt.append(int(attempt))
@@ -47,7 +47,7 @@ class TypeRacer:
     def getAll(self):
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
-    def plotWPM(self, pb_on=False, denoising_line=0):
+    def plotWPM(self, pb_on: bool = False, denoising_line: int = 0):
         plt.plot(self.attempt, self.wpm, label="wpm")
 
         plt.ylabel("Speed (WPM)")
@@ -108,7 +108,7 @@ class TypeRacer:
 
         plt.show()
 
-    def plotAccuracy(self, denoising_line=0):
+    def plotAccuracy(self, denoising_line: int = 0):
         plt.plot(self.attempt, self.accuracy, label="accuracy")
 
         plt.ylabel("Accuracy")
@@ -150,7 +150,7 @@ class TypeRacer:
 
         plt.show()
         
-    def download(self, path):
+    def download(self, path: str):
         with open(path, "w") as f:
             for attempt, wpm, accuracy, score, place, date in zip(self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date):
                 f.write(f"{attempt};{wpm};{accuracy};{score};{place};{date}\n")
