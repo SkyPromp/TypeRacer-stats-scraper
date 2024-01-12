@@ -47,14 +47,17 @@ class TypeRacer:
     def getAll(self):
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
-    def plotWPM(self, pb_on: bool = False, denoising_line: int = 0, average_on: bool = False):
+    def plotWPM(self, pb_smooth_on: bool = False, pb_snap_on: bool = False, denoising_line: int = 0, average_on: bool = False):
         plt.plot(self.attempt, self.wpm, label="wpm")
 
         plt.ylabel("Speed (WPM)")
         plt.xlabel("Amount of races")
 
-        if pb_on:
+        if pb_smooth_on:
             self._pbGradual(self.wpm, label="PB Speeds (WPM)")
+
+        if pb_snap_on:
+            self._pbSnap(self.wpm, label="PB Speeds (WPM)")
 
         if denoising_line > 0:
             self._plotSmooth(self.wpm, denoising_line)
@@ -128,7 +131,29 @@ class TypeRacer:
                 pb_score = data
                 plt.axhline(y=data, color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
 
-        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="pb's", linewidth=1)
+        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="PB's", linewidth=1)
+
+        ax2 = plt.gca().secondary_yaxis('right')
+        ax2.set_yticks(list(map(lambda x: x[1], pb)))
+        plt.subplots_adjust(right=0.85)
+        ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
+                       multialignment='center')
+
+    def _pbSnap(self, data_source, label: str = "PB"):
+        pb_score = data_source[-1]
+        pb = [[self.attempt[-1], pb_score]]
+
+        for attempt, data in list(reversed(list(zip(self.attempt, data_source))))[1:]:
+            if data > pb_score:
+                plt.axhline(y=pb[-1][1], color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
+
+                pb.append([attempt, pb_score])
+                pb.append([attempt, data])
+                pb_score = data
+
+        pb.append([max(self.attempt), pb_score])
+
+        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="PB's", linewidth=1)
 
         ax2 = plt.gca().secondary_yaxis('right')
         ax2.set_yticks(list(map(lambda x: x[1], pb)))
