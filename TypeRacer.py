@@ -133,6 +133,22 @@ class TypeRacer:
         plt.legend()
         plt.title("Typing Accuracy")
         plt.show()
+
+    def histAccuracy(self):
+        rounded = list(map(lambda x: round(x, 2), self.accuracy))
+
+        _, counts = np.unique(rounded, return_counts=True)
+
+        bins = np.arange(min(rounded), 1.01, 0.01)
+        plt.hist(self.accuracy, bins=np.append(bins, 1.01))
+
+        plt.title("Typing test accuracy distribution")
+        plt.xlabel("Accuracy")
+        plt.ylabel("Amount of races")
+        plt.xticks(bins)
+        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / 6))))
+
+        plt.show()
         
     def download(self, path):
         with open(path, "w") as f:
