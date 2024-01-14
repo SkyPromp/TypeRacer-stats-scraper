@@ -92,7 +92,7 @@ class TypeRacer:
         plt.xlabel("Amount of races")
 
         if denoising_line > 0:
-            self._plotSmooth(denoising_line)
+            self._plotSmooth(self.accuracy, denoising_line=denoising_line)
         if average_on:
             self._plotAverage(self.accuracy)
 
@@ -105,7 +105,7 @@ class TypeRacer:
     def _average(data):
         return sum(map(lambda y: y[1], data))/len(data)
 
-    def _plotSmooth(self, data_source, denoising_line: int = 10, label="Smooth"):
+    def _plotSmooth(self, data_source, denoising_line: int = 10, label="Smooth", color="red"):
         local_points = []
         points = []
 
@@ -116,10 +116,10 @@ class TypeRacer:
 
             points.append([attempt, TypeRacer._average(local_points)])
 
-        plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color="red", label=label, linewidth=1)
+        plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color=color, label=label, linewidth=1)
 
     def _plotAverage(self, data):
-        self._plotSmooth(data, len(data), label="Average")
+        self._plotSmooth(data, len(data), label="Average", color="green")
 
     def _pbGradual(self, data_source, label: str = "PB"):
         pb_score = 0
