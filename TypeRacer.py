@@ -5,8 +5,8 @@ import numpy as np
 
 
 class TypeRacer:
-    def __init__(self, username: str):
-        html = requests.get(f"https://data.typeracer.com/pit/race_history?user={username}&n=2147483647&startDate=&universe=").text
+    def __init__(self, username: str, universe: str = ""):
+        html = requests.get(f"https://data.typeracer.com/pit/race_history?user={username}&n=2147483647&startDate=&universe={universe}").text
         data = (BeautifulSoup(html, 'lxml')
                 .find_all('div', class_="Scores__Table__Row"))
 
