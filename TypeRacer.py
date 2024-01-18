@@ -81,7 +81,7 @@ class TypeRacer:
         plt.title("Typing test speed distribution")
         plt.xlabel("Speed (WPM)")
         plt.ylabel("Amount of races")
-        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / 6))))
+        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.show()
 
@@ -173,7 +173,7 @@ class TypeRacer:
         plt.xlabel("Accuracy")
         plt.ylabel("Amount of races")
         plt.xticks(bins + 0.005, [f"{value:.2f}" for value in bins])
-        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / 6))))
+        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.show()
         
