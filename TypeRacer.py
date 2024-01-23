@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime, date
 
 
 class TypeRacer:
@@ -176,7 +177,33 @@ class TypeRacer:
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.show()
-        
+
+    def plotDailyRaces(self):
+        months = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+        entries = {}
+
+        for attempt, current_date in reversed(list(zip(self.attempt, self.date))):
+            if current_date == "today":
+                current_date = date.today()
+            else:
+                month, day, year = current_date.split(" ")
+                day = int(day[:-1])
+                month = months.index(month) + 1
+                year = int(year)
+
+                current_date = datetime(year, month, day)
+
+            if current_date in entries:
+                entries[current_date] += 1
+            else:
+                entries[current_date] = 1
+
+        plt.title("Total races per day")
+        plt.xticks(rotation=-90)
+        plt.subplots_adjust(bottom=0.2)
+        plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
+        plt.show()
+
     def download(self, path: str):
         with open(path, "w") as f:
             for attempt, wpm, accuracy, score, place, date in zip(self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date):
