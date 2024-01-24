@@ -7,9 +7,9 @@ from datetime import datetime, date
 
 class TypeRacer:
     def __init__(self, username: str, universe: str = ""):
-        html = requests.get(f"https://data.typeracer.com/pit/race_history?user={username}&n=2147483647&startDate=&universe={universe}").text
-        data = (BeautifulSoup(html, 'lxml')
-                .find_all('div', class_="Scores__Table__Row"))
+        amount = 1550  # n=2147483647
+        link = "https://data.typeracer.com/pit/race_history"
+        next_link = f"{link}?user={username}&n={amount}&startDate=&universe={universe}"
 
         self.wpm = []
         self.accuracy = []
@@ -18,6 +18,27 @@ class TypeRacer:
         self.place = []
         self.date = []
 
+        i = 0
+
+        while True:
+            html = requests.get(next_link).text
+            data = BeautifulSoup(html, 'lxml')
+            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
+            print(i)  # TODO: display progress by scraping total race count
+            i += 1
+
+            try:
+                next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
+                if next_link.text == """\n\n          load older results »\n        \n""":
+                        next_link = link + next_link.find("a").get("href")
+                else:
+                    break
+            except AttributeError as e:
+                break
+
+        print("Done loading data.")
+
+    def retrieveData(self, data):
         for item in data:
             attempt, wpm, accuracy, score, place, date = [i.strip() for i in item.text.strip().split("\n") if i.strip()]
             self.wpm.append(int(wpm.split(" ")[0]))
@@ -26,7 +47,6 @@ class TypeRacer:
             self.score.append(int(score))
             self.place.append(place)
             self.date.append(date)
-
     def getAttempt(self):
         return self.attempt
 
@@ -179,7 +199,7 @@ class TypeRacer:
         plt.show()
 
     def plotDailyRaces(self):
-        months = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+        months = ['Jan.', 'Feb.', 'March', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         entries = {}
 
         for attempt, current_date in reversed(list(zip(self.attempt, self.date))):
@@ -203,6 +223,7 @@ class TypeRacer:
         plt.subplots_adjust(bottom=0.2)
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
         plt.show()
+
 
     def download(self, path: str):
         with open(path, "w") as f:
