@@ -134,8 +134,8 @@ class TypeRacer:
         fastest_rel = max(self.wpm) - slowest
         fig, ax = plt.subplots()
 
-        colors = list(map(lambda speed: (lambda interpolated: (interpolated, 1 - interpolated, 0))(self.lerp(1, 0, (speed - slowest) / float(fastest_rel))), self.wpm))
-        plt.scatter(self.attempt, self.accuracy, c=colors)
+        inter = list(map(lambda speed: (speed - slowest) / float(fastest_rel), self.wpm))
+        plt.scatter(self.attempt, self.accuracy, c=inter, cmap="RdYlGn")
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
@@ -159,8 +159,8 @@ class TypeRacer:
         most_rel = max(self.accuracy) - least
         fig, ax = plt.subplots()
 
-        colors = list(map(lambda acc: (lambda interpolated: (interpolated, 1 - interpolated, 0))(self.lerp(1, 0, (acc - least) / float(most_rel))), self.accuracy))
-        plt.scatter(self.attempt, self.wpm, c=colors)
+        inter = list(map(lambda acc: (acc - least) / float(most_rel), self.accuracy))
+        plt.scatter(self.attempt, self.wpm, c=inter, cmap="RdYlGn")
 
         plt.title("Typing Speed")
         plt.ylabel("WPM")
@@ -274,9 +274,6 @@ class TypeRacer:
         plt.subplots_adjust(bottom=0.2)
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
         plt.show()
-
-    def lerp(self, a, b, t):
-        return a + (b - a) * t
 
     def download(self, path: str):
         with open(path, "w") as f:
