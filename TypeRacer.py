@@ -122,6 +122,9 @@ class TypeRacer:
         plt.xlim(1, max(self.attempt))
         plt.ylim(top=1)
         plt.legend()
+        ax2 = plt.gca().secondary_yaxis('right')
+
+        ax2.set_yticks(plt.yticks()[0])
         plt.title("Typing Accuracy")
         plt.show()
 
