@@ -3,6 +3,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime, date
+import matplotlib.colors as mcolors
 
 
 class TypeRacer:
@@ -128,6 +129,52 @@ class TypeRacer:
         plt.title("Typing Accuracy")
         plt.show()
 
+    def plotAccWPMCorrelation(self):
+        slowest = min(self.wpm)
+        fastest_rel = max(self.wpm) - slowest
+        fig, ax = plt.subplots()
+
+        for attempt, accuracy, wpm in list(reversed(list(zip(self.attempt, self.accuracy, self.wpm)))):
+            interpolated_value = self.lerp(1, 0, (wpm - slowest) / float(fastest_rel))
+            plt.scatter(attempt, accuracy, color=(interpolated_value, 1 - interpolated_value, 0))
+
+        plt.ylabel("Accuracy")
+        plt.xlabel("Amount of races")
+
+        plt.xlim(1, max(self.attempt))
+        plt.ylim(top=1)
+        ax2 = plt.gca().secondary_yaxis('right')
+        ax2.set_yticks(plt.yticks()[0])
+
+        norm = mcolors.Normalize(vmin=slowest, vmax=fastest_rel)
+        sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
+        sm.set_array([])
+
+        plt.colorbar(sm, ax=ax, orientation='vertical', label='Speed', pad=0.1)
+
+        plt.title("Typing Accuracy")
+        plt.show()
+
+    def plotWPMAccCorrelation(self):
+        least = min(self.accuracy)
+        most_rel = max(self.accuracy) - least
+        fig, ax = plt.subplots()
+
+        for attempt, accuracy, wpm in list(reversed(list(zip(self.attempt, self.accuracy, self.wpm)))):
+            interpolated_value = self.lerp(1, 0, (accuracy - least) / float(most_rel))
+            plt.scatter(attempt, wpm, color=(interpolated_value, 1 - interpolated_value, 0))
+
+        plt.title("Typing Speed")
+        plt.ylabel("WPM")
+        plt.xlabel("Amount of races")
+
+        norm = mcolors.Normalize(vmin=least, vmax=most_rel)
+        sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
+        sm.set_array([])
+        plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
+
+        plt.show()
+
     @staticmethod
     def _average(data):
         return sum(map(lambda y: y[1], data))/len(data)
@@ -230,6 +277,8 @@ class TypeRacer:
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
         plt.show()
 
+    def lerp(self, a, b, t):
+        return a + (b - a) * t
 
     def download(self, path: str):
         with open(path, "w") as f:
