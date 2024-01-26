@@ -168,7 +168,7 @@ class TypeRacer:
         plt.ylabel("WPM")
         plt.xlabel("Amount of races")
 
-        norm = mcolors.Normalize(vmin=least, vmax=most_rel)
+        norm = mcolors.Normalize(vmin=least, vmax=max(self.accuracy))
         sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
         sm.set_array([])
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
