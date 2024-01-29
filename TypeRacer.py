@@ -19,14 +19,10 @@ class TypeRacer:
         self.place = []
         self.date = []
 
-        i = 0
-
         while True:
             html = requests.get(next_link).text
             data = BeautifulSoup(html, 'lxml')
             self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
-            print(i)  # TODO: display progress by scraping total race count
-            i += 1
 
             try:
                 next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
@@ -134,8 +130,13 @@ class TypeRacer:
         fastest_rel = max(self.wpm) - slowest
         fig, ax = plt.subplots()
 
+        if len(self.attempt) > 6000:
+            s = 1
+        else:
+            s = 20
+
         inter = list(map(lambda speed: (speed - slowest) / float(fastest_rel), self.wpm))
-        plt.scatter(self.attempt, self.accuracy, c=inter, cmap="RdYlGn")
+        plt.scatter(self.attempt, self.accuracy, c=inter, cmap="RdYlGn", s=s)
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
@@ -157,10 +158,15 @@ class TypeRacer:
     def plotWPMAccCorrelation(self):
         least = min(self.accuracy)
         most_rel = max(self.accuracy) - least
+        if len(self.attempt) > 6000:
+            s = 1
+        else:
+            s = 20
+
         fig, ax = plt.subplots()
 
         inter = list(map(lambda acc: (acc - least) / float(most_rel), self.accuracy))
-        plt.scatter(self.attempt, self.wpm, c=inter, cmap="RdYlGn")
+        plt.scatter(self.attempt, self.wpm, c=inter, cmap="RdYlGn", s=s)
 
         plt.title("Typing Speed")
         plt.ylabel("WPM")
