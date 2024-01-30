@@ -1,16 +1,15 @@
-from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime, date
 import matplotlib.colors as mcolors
+from time import time
 
 
 class TypeRacer:
-    def __init__(self, username: str, universe: str = ""):
-        amount = 1550  # n=2147483647
-        link = "https://data.typeracer.com/pit/race_history"
-        next_link = f"{link}?user={username}&n={amount}&startDate=&universe={universe}"
+    def __init__(self, username: str, universe: str = "play"):
+        end_time = time()
+        start_time = 0
 
         self.wpm = []
         self.accuracy = []
@@ -18,34 +17,51 @@ class TypeRacer:
         self.score = []
         self.place = []
         self.date = []
+        self.text = []
+        self.racers_amount = []
+        self.skill_level = []
+
 
         while True:
-            html = requests.get(next_link).text
-            data = BeautifulSoup(html, 'lxml')
-            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
-
+            start = time()
+            link = f"https://data.typeracer.com/games?playerId=tr:{username}&universe={universe}&startDate={start_time}&endDate={end_time}"
             try:
-                next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
-                if next_link.text == """\n\n          load older results »\n        \n""":
-                        next_link = link + next_link.find("a").get("href")
-                else:
-                    break
-            except AttributeError as e:
+                data = requests.get(link).json()
+                print("get", time() - start)
+                start = time()
+            except requests.exceptions.JSONDecodeError as e:  # move to outside of the loop
+                print("invalid data")
+                print(e)
+
+            for unit in data:
+                self.wpm.append(unit["wpm"])
+                self.accuracy.append(unit["ac"])
+                self.attempt.append(unit["gn"])
+                self.score.append(unit["pts"])
+                self.place.append(unit["r"])
+                self.date.append(unit["t"])
+                self.text.append(unit["tid"])
+                self.racers_amount.append(unit["np"])
+                self.skill_level.append(unit["sl"])
+
+            end_time = min(self.date) - 1
+            print(self.attempt[-1])
+            if min(self.attempt) == 1:
                 break
-            except IndexError as e:
-                break
+
+            print("append", time() - start)
+            # print("self.wpm", self.wpm)
+            # print("self.accuracy", self.accuracy)
+            # print("self.attempt", self.attempt)
+            # print("self.score", self.score)
+            # print("self.place", self.place)
+            # print("self.date", self.date)
+            # print("self.text", self.text)
+            # print("self.racers_amount", self.racers_amount)
+            # print("self.skill_level", self.skill_level)
 
         print("Done loading data.")
 
-    def retrieveData(self, data):
-        for item in data:
-            attempt, wpm, accuracy, score, place, date = [i.strip() for i in item.text.strip().split("\n") if i.strip()]
-            self.wpm.append(int(wpm.split(" ")[0]))
-            self.accuracy.append((round(float(accuracy.replace("%", ""))/100, 3)))
-            self.attempt.append(int(attempt))
-            self.score.append(int(score))
-            self.place.append(place)
-            self.date.append(date)
     def getAttempt(self):
         return self.attempt
 
