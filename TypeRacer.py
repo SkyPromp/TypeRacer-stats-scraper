@@ -43,6 +43,78 @@ class TypeRacer:
 
         print("Done loading data.")
 
+    async def getData(self, width, start, n, username, universe):
+        start_time = start + width * n
+        end_time = start + width * (n + 1) - 1
+
+        timestamp = []
+
+        wpm = []
+        accuracy = []
+        attempt = []
+        score = []
+        place = []
+        timestamps = []
+        text = []
+        racers_amount = []
+        skill_level = []
+
+        last_time = 0
+
+        try:
+            while True:
+                link = f"https://data.typeracer.com/games?playerId=tr:{username}&universe={universe}&startDate={start_time}&endDate={end_time}"
+                data = requests.get(link).json()
+
+                temp = self.writeDataSplit(data)
+
+                if min(timestamp) != last_time:
+                    wpm.append(temp[0])
+                    accuracy.append(temp[1])
+                    attempt.append(temp[2])
+                    score.append(temp[3])
+                    place.append(temp[4])
+                    timestamps.append(temp[5])
+                    text.append(temp[6])
+                    racers_amount.append(temp[7])
+                    skill_level.append(temp[8])
+
+                    end_time = min(timestamp) - 1
+                    last_time = min(timestamp)
+                else:
+                    break
+
+        except requests.exceptions.JSONDecodeError as e:
+            print("invalid data")
+            print(e)
+
+        print(wpm, accuracy, attempt, score, place, timestamp, text, racers_amount, skill_level, sep="\n")
+        return wpm, accuracy, attempt, score, place, timestamp, text, racers_amount, skill_level
+
+    def writeDataSplit(self, data):
+        wpm = []
+        accuracy = []
+        attempt = []
+        score = []
+        place = []
+        timestamp = []
+        text = []
+        racers_amount = []
+        skill_level = []
+
+        for unit in data:
+            wpm.append(unit["wpm"])
+            accuracy.append(unit["ac"])
+            attempt.append(unit["gn"])
+            score.append(unit["pts"])
+            place.append(unit["r"])
+            timestamp.append(unit["t"])
+            text.append(unit["tid"])
+            racers_amount.append(unit["np"])
+            skill_level.append(unit["sl"])
+
+        return wpm, accuracy, attempt, score, place, timestamp, text, racers_amount, skill_level
+
     def writeData(self, data):
         for unit in data:
             self.wpm.append(unit["wpm"])
