@@ -146,7 +146,7 @@ class TypeRacer:
         ax2 = plt.gca().secondary_yaxis('right')
         ax2.set_yticks(plt.yticks()[0])
 
-        norm = mcolors.Normalize(vmin=slowest, vmax=fastest_rel)
+        norm = mcolors.Normalize(vmin=slowest, vmax=max(self.wpm))
         sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
         sm.set_array([])
 
