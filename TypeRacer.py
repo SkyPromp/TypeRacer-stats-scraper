@@ -5,6 +5,8 @@ from datetime import datetime, date
 import matplotlib.colors as mcolors
 from time import time
 
+from bs4 import BeautifulSoup
+
 
 class TypeRacer:
     def __init__(self, username: str, universe: str = "play"):
@@ -21,46 +23,63 @@ class TypeRacer:
         self.racers_amount = []
         self.skill_level = []
 
-
-        while True:
-            start = time()
-            link = f"https://data.typeracer.com/games?playerId=tr:{username}&universe={universe}&startDate={start_time}&endDate={end_time}"
-            try:
+        try:
+            while True:
+                link = f"https://data.typeracer.com/games?playerId=tr:{username}&universe={universe}&startDate={start_time}&endDate={end_time}"
                 data = requests.get(link).json()
-                print("get", time() - start)
-                start = time()
-            except requests.exceptions.JSONDecodeError as e:  # move to outside of the loop
-                print("invalid data")
-                print(e)
+                self.writeData(data)
 
-            for unit in data:
-                self.wpm.append(unit["wpm"])
-                self.accuracy.append(unit["ac"])
-                self.attempt.append(unit["gn"])
-                self.score.append(unit["pts"])
-                self.place.append(unit["r"])
-                self.date.append(unit["t"])
-                self.text.append(unit["tid"])
-                self.racers_amount.append(unit["np"])
-                self.skill_level.append(unit["sl"])
+                end_time = min(self.date) - 1
 
-            end_time = min(self.date) - 1
-            print(self.attempt[-1])
-            if min(self.attempt) == 1:
-                break
+                print(self.attempt[-1])
 
-            print("append", time() - start)
-            # print("self.wpm", self.wpm)
-            # print("self.accuracy", self.accuracy)
-            # print("self.attempt", self.attempt)
-            # print("self.score", self.score)
-            # print("self.place", self.place)
-            # print("self.date", self.date)
-            # print("self.text", self.text)
-            # print("self.racers_amount", self.racers_amount)
-            # print("self.skill_level", self.skill_level)
+                if min(self.attempt) == 1:
+                    break
+
+        except requests.exceptions.JSONDecodeError as e:
+            print("invalid data")
+            print(e)
+
 
         print("Done loading data.")
+
+    def writeData(self, data):
+        for unit in data:
+            self.wpm.append(unit["wpm"])
+            self.accuracy.append(unit["ac"])
+            self.attempt.append(unit["gn"])
+            self.score.append(unit["pts"])
+            self.place.append(unit["r"])
+            self.date.append(unit["t"])
+            self.text.append(unit["tid"])
+            self.racers_amount.append(unit["np"])
+            self.skill_level.append(unit["sl"])
+
+    def getStartDate(name):
+        link = f"https://data.typeracer.com/pit/profile?user={name}"
+        html = requests.get(link).text
+        data = BeautifulSoup(html, 'lxml')
+        data = data.find('div', class_="About").find_all("div")
+        date = "Jan. 1, 1970"
+
+        for div in data:
+            title, info = div.find_all("span")
+            if title.text == "Racing Since:":
+                date = info.text
+
+        months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
+
+        if date != "today":
+            month, day, year = date.split(" ")
+            day = int(day[:-1])
+            month = months.index(month) + 1
+            year = int(year)
+            date = datetime(year, month, day)
+
+        else:
+            date = date.today()
+
+        return date
 
     def getAttempt(self):
         return self.attempt
