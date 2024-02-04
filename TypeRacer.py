@@ -22,6 +22,7 @@ class TypeRacer:
         while True:
             html = requests.get(next_link).text
             data = BeautifulSoup(html, 'lxml')
+
             self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
 
             try:
@@ -43,7 +44,7 @@ class TypeRacer:
             self.wpm.append(int(wpm.split(" ")[0]))
             self.accuracy.append((round(float(accuracy.replace("%", ""))/100, 3)))
             self.attempt.append(int(attempt))
-            self.score.append(int(score))
+            self.score.append(int(score if score != "N/A" else 0))
             self.place.append(place)
             self.date.append(date)
     def getAttempt(self):
@@ -193,7 +194,7 @@ class TypeRacer:
                 local_points.pop(0)
 
             points.append([attempt, TypeRacer._average(local_points)])
-
+        print(max(list(map(lambda x: x[1], points))))
         plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color=color, label=label, linewidth=1)
 
     def _plotAverage(self, data):
