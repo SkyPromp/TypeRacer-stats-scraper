@@ -69,6 +69,7 @@ class TypeRacer:
         return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
 
     def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, denoising_line: int = 10, average_on: bool = True):
+        plt.figure()
         plt.plot(self.attempt, self.wpm, label="Speed")
 
         plt.ylabel("Speed (WPM)")
@@ -89,9 +90,12 @@ class TypeRacer:
         plt.legend()
 
         plt.title("Typing Speed")
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/WPM.png")
 
     def histWPM(self):
+        plt.figure()
         unique_values, counts = np.unique(self.wpm, return_counts=True)
         sorted_indices = np.argsort(unique_values)
         unique_values = unique_values[sorted_indices]
@@ -104,9 +108,12 @@ class TypeRacer:
         plt.ylabel("Amount of races")
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/histWPM.png")
 
     def plotAccuracy(self, denoising_line: int = 10, average_on: bool = True):
+        plt.figure()
         plt.plot(self.attempt, self.accuracy, label="Accuracy")
 
         plt.ylabel("Accuracy")
@@ -124,9 +131,12 @@ class TypeRacer:
 
         ax2.set_yticks(plt.yticks()[0])
         plt.title("Typing Accuracy")
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/Accuracy.png")
 
     def plotAccWPMCorrelation(self):
+        plt.figure()
         slowest = min(self.wpm)
         fastest_rel = max(self.wpm) - slowest
         fig, ax = plt.subplots()
@@ -154,9 +164,12 @@ class TypeRacer:
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Speed', pad=0.1)
 
         plt.title("Typing Accuracy")
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/AccWPM.png")
 
     def plotWPMAccCorrelation(self):
+        plt.figure()
         least = min(self.accuracy)
         most_rel = max(self.accuracy) - least
         if len(self.attempt) > 6000:
@@ -178,7 +191,9 @@ class TypeRacer:
         sm.set_array([])
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
 
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/WPMAcc.png")
 
     @staticmethod
     def _average(data):
@@ -194,7 +209,7 @@ class TypeRacer:
                 local_points.pop(0)
 
             points.append([attempt, TypeRacer._average(local_points)])
-        print(max(list(map(lambda x: x[1], points))))
+
         plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color=color, label=label, linewidth=1)
 
     def _plotAverage(self, data):
@@ -241,6 +256,7 @@ class TypeRacer:
                        multialignment='center')
 
     def histAccuracy(self):
+        plt.figure()
         rounded = list(map(lambda x: round(x, 2), self.accuracy))
 
         _, counts = np.unique(rounded, return_counts=True)
@@ -254,9 +270,12 @@ class TypeRacer:
         plt.xticks(bins + 0.005, [f"{value:.2f}" for value in bins])
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/histAcc.png")
 
     def plotDailyRaces(self):
+        plt.figure()
         months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         entries = {}
 
@@ -280,7 +299,9 @@ class TypeRacer:
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
-        plt.show()
+        #plt.show()
+
+        plt.savefig("./img/DailyRaces.png")
 
     def download(self, path: str):
         with open(path, "w") as f:
