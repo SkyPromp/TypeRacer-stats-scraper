@@ -1,16 +1,17 @@
+import time
+
 from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime, date
 import matplotlib.colors as mcolors
-
+import re
+from time import sleep
 
 class TypeRacer:
     def __init__(self, username: str, universe: str = ""):
-        amount = 1550  # n=2147483647
-        link = "https://data.typeracer.com/pit/race_history"
-        next_link = f"{link}?user={username}&n={amount}&startDate=&universe={universe}"
+        link = f"https://data.typeracer.com/pit/race_history?user={username}&n=1&startDate=&universe={universe}"
 
         self.wpm = []
         self.accuracy = []
@@ -19,24 +20,34 @@ class TypeRacer:
         self.place = []
         self.date = []
 
-        while True:
-            html = requests.get(next_link).text
-            data = BeautifulSoup(html, 'lxml')
+        html = requests.get(link).text
+        data = BeautifulSoup(html, 'lxml')
+        data = data.find('div', class_="Scores__Table__Row")
+        amount = int(data.find("div", class_="profileTableHeaderUniverse").find("a").text.strip())
 
-            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
-
-            try:
-                next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
-                if next_link.text == """\n\n          load older results »\n        \n""":
-                        next_link = link + next_link.find("a").get("href")
-                else:
-                    break
-            except AttributeError as e:
-                break
-            except IndexError as e:
-                break
+        for i in range(1, amount + 1):
+            link = f"https://data.typeracer.com/pit/result?id={universe}|tr:{username}|{i}"
+            self.getData(link)
+            time.sleep(0.08)
 
         print("Done loading data.")
+
+    def getData(self, link):  # async
+        counter = 10
+        html = ""
+        while html == "" and counter > 0:
+            counter -= 1
+            html = requests.get(link).text
+
+        data = BeautifulSoup(html, 'lxml')
+        data = data.find('table', class_="raceDetails").find_all("tr")
+        data = list(map(lambda tr: tr.find_all("td")[1].text.strip(), data))[1:]
+        attempt, date_str, wpm, accuracy, place, *_ = data
+        self.wpm.append(int(wpm.split(" ")[0]))
+        self.accuracy.append(float(accuracy[:-1]))
+        self.place.append(int(re.findall("[0-9]*", place)[0]))
+        self.attempt.append(int(attempt))
+        self.date.append(datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z'))
 
     def retrieveData(self, data):
         for item in data:
