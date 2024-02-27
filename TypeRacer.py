@@ -283,6 +283,7 @@ class TypeRacer:
         plt.figure()
         least = min(self.attempt)
         most = max(self.attempt)
+
         if len(self.attempt) > 6000:
             s = 1
         else:
@@ -293,7 +294,7 @@ class TypeRacer:
         inter = list(map(lambda attempt_: (attempt_ - least) / float(most), self.attempt))
         plt.scatter(self.accuracy, self.wpm, c=inter, cmap="RdYlGn", s=s)
 
-        plt.title("Typing Speed")
+        plt.title("Speed/Accuracy")
         plt.ylabel("Speed (WPM)")
         plt.xlabel("Accuracy")
 
