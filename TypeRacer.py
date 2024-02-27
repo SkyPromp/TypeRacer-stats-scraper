@@ -188,7 +188,7 @@ class TypeRacer:
         plt.scatter(self.attempt, self.wpm, c=inter, cmap="RdYlGn", s=s)
 
         plt.title("Typing Speed")
-        plt.ylabel("WPM")
+        plt.ylabel("Speed (WPM)")
         plt.xlabel("Amount of races")
 
         norm = mcolors.Normalize(vmin=least, vmax=max(self.accuracy))
@@ -279,6 +279,33 @@ class TypeRacer:
 
         plt.savefig("./img/histAcc.png")
 
+    def wpmAcc(self):
+        plt.figure()
+        least = min(self.attempt)
+        most = max(self.attempt)
+        if len(self.attempt) > 6000:
+            s = 1
+        else:
+            s = 20
+
+        fig, ax = plt.subplots()
+
+        inter = list(map(lambda attempt_: (attempt_ - least) / float(most), self.attempt))
+        plt.scatter(self.accuracy, self.wpm, c=inter, cmap="RdYlGn", s=s)
+
+        plt.title("Typing Speed")
+        plt.ylabel("Speed (WPM)")
+        plt.xlabel("Accuracy")
+
+        norm = mcolors.Normalize(vmin=least, vmax=most)
+        sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
+        sm.set_array([])
+        plt.colorbar(sm, ax=ax, orientation='vertical', label='Attempts')
+
+        # plt.show()
+
+        plt.savefig("./img/wpmAccRace.png")
+
     def toDatetime(self, current_date: str) -> datetime:
         months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         if current_date == "today":
@@ -295,7 +322,6 @@ class TypeRacer:
 
     def plotDailyRaces(self):
         plt.figure()
-        months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         entries = {}
 
         for attempt, current_date in reversed(list(zip(self.attempt, self.date))):
