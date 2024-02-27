@@ -2,12 +2,12 @@ from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import datetime, date
+from datetime import datetime
 import matplotlib.colors as mcolors
 
 
 class TypeRacer:
-    def __init__(self, username: str, universe: str = ""):
+    def __init__(self, username: str, universe: str = "", start_date: datetime = None):
         amount = 1550  # n=2147483647
         link = "https://data.typeracer.com/pit/race_history"
         next_link = f"{link}?user={username}&n={amount}&startDate=&universe={universe}"
@@ -23,7 +23,7 @@ class TypeRacer:
             html = requests.get(next_link).text
             data = BeautifulSoup(html, 'lxml')
 
-            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"))
+            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"), start_date)
 
             try:
                 next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
@@ -38,15 +38,20 @@ class TypeRacer:
 
         print("Done loading data.")
 
-    def retrieveData(self, data):
+    def retrieveData(self, data, start_date):
         for item in data:
             attempt, wpm, accuracy, score, place, date = [i.strip() for i in item.text.strip().split("\n") if i.strip()]
+            item_date = self.toDatetime(date)
+
+            if start_date is not None and item_date < start_date:
+                continue
+
             self.wpm.append(int(wpm.split(" ")[0]))
             self.accuracy.append((round(float(accuracy.replace("%", ""))/100, 3)))
             self.attempt.append(int(attempt))
             self.score.append(int(score if score != "N/A" else 0))
             self.place.append(place)
-            self.date.append(date)
+            self.date.append(item_date)
     def getAttempt(self):
         return self.attempt
 
@@ -274,22 +279,26 @@ class TypeRacer:
 
         plt.savefig("./img/histAcc.png")
 
+    def toDatetime(self, current_date: str) -> datetime:
+        months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
+        if current_date == "today":
+            current_date = datetime.today()
+        else:
+            month, day, year = current_date.split(" ")
+            day = int(day[:-1])
+            month = months.index(month) + 1
+            year = int(year)
+
+            current_date = datetime(year, month, day)
+
+        return current_date
+
     def plotDailyRaces(self):
         plt.figure()
         months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         entries = {}
 
         for attempt, current_date in reversed(list(zip(self.attempt, self.date))):
-            if current_date == "today":
-                current_date = date.today()
-            else:
-                month, day, year = current_date.split(" ")
-                day = int(day[:-1])
-                month = months.index(month) + 1
-                year = int(year)
-
-                current_date = datetime(year, month, day)
-
             if current_date in entries:
                 entries[current_date] += 1
             else:
