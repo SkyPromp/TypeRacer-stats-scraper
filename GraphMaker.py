@@ -1,77 +1,11 @@
-from bs4 import BeautifulSoup
-import requests
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import datetime
 import matplotlib.colors as mcolors
 
 
-class TypeRacer:
-    def __init__(self, username: str, universe: str = "", start_date: datetime = None):
-        amount = 1550  # n=2147483647
-        link = "https://data.typeracer.com/pit/race_history"
-        next_link = f"{link}?user={username}&n={amount}&startDate=&universe={universe}"
-
-        self.wpm = []
-        self.accuracy = []
-        self.attempt = []
-        self.score = []
-        self.place = []
-        self.date = []
-
-        while True:
-            html = requests.get(next_link).text
-            data = BeautifulSoup(html, 'lxml')
-
-            self.retrieveData(data.find_all('div', class_="Scores__Table__Row"), start_date)
-
-            try:
-                next_link = data.find('div', class_="themeContent pit").find_all("span")[-1]
-                if next_link.text == """\n\n          load older results »\n        \n""":
-                        next_link = link + next_link.find("a").get("href")
-                else:
-                    break
-            except AttributeError as e:
-                break
-            except IndexError as e:
-                break
-
-        print("Done loading data.")
-
-    def retrieveData(self, data, start_date):
-        for item in data:
-            attempt, wpm, accuracy, score, place, date = [i.strip() for i in item.text.strip().split("\n") if i.strip()]
-            item_date = self.toDatetime(date)
-
-            if start_date is not None and item_date < start_date:
-                continue
-
-            self.wpm.append(int(wpm.split(" ")[0]))
-            self.accuracy.append((round(float(accuracy.replace("%", ""))/100, 3)))
-            self.attempt.append(int(attempt))
-            self.score.append(int(score if score != "N/A" else 0))
-            self.place.append(place)
-            self.date.append(item_date)
-    def getAttempt(self):
-        return self.attempt
-
-    def getWPM(self):
-        return self.wpm
-
-    def getAccuracy(self):
-        return self.accuracy
-
-    def getScore(self):
-        return self.score
-
-    def getPlace(self):
-        return self.place
-
-    def getDate(self):
-        return self.date
-
-    def getAll(self):
-        return self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date
+class GraphMaker:
+    def __init__(self, data):
+        self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date = data
 
     def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, denoising_line: int = 10, average_on: bool = True):
         plt.figure()
@@ -213,7 +147,7 @@ class TypeRacer:
             if len(local_points) > denoising_line:
                 local_points.pop(0)
 
-            points.append([attempt, TypeRacer._average(local_points)])
+            points.append([attempt, GraphMaker._average(local_points)])
 
         plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color=color, label=label, linewidth=1)
 
@@ -307,20 +241,6 @@ class TypeRacer:
 
         plt.savefig("./img/wpmAccRace.png")
 
-    def toDatetime(self, current_date: str) -> datetime:
-        months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
-        if current_date == "today":
-            current_date = datetime.today()
-        else:
-            month, day, year = current_date.split(" ")
-            day = int(day[:-1])
-            month = months.index(month) + 1
-            year = int(year)
-
-            current_date = datetime(year, month, day)
-
-        return current_date
-
     def plotDailyRaces(self):
         plt.figure()
         entries = {}
@@ -338,8 +258,3 @@ class TypeRacer:
         #plt.show()
 
         plt.savefig("./img/DailyRaces.png")
-
-    def download(self, path: str):
-        with open(path, "w") as f:
-            for attempt, wpm, accuracy, score, place, date in zip(self.attempt, self.wpm, self.accuracy, self.score, self.place, self.date):
-                f.write(f"{attempt};{wpm};{accuracy};{score};{place};{date}\n")
