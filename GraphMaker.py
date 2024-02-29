@@ -30,7 +30,6 @@ class GraphMaker:
         plt.legend()
 
         plt.title("Typing Speed")
-        #plt.show()
 
         plt.savefig("./img/WPM.png")
 
@@ -47,8 +46,6 @@ class GraphMaker:
         plt.xlabel("Speed (WPM)")
         plt.ylabel("Amount of races")
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
-
-        #plt.show()
 
         plt.savefig("./img/histWPM.png")
 
@@ -71,7 +68,6 @@ class GraphMaker:
 
         ax2.set_yticks(plt.yticks()[0])
         plt.title("Typing Accuracy")
-        #plt.show()
 
         plt.savefig("./img/Accuracy.png")
 
@@ -103,7 +99,6 @@ class GraphMaker:
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Speed', pad=0.1)
 
         plt.title("Typing Accuracy")
-        #plt.show()
 
         plt.savefig("./img/AccWPM.png")
 
@@ -128,8 +123,6 @@ class GraphMaker:
         sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
         sm.set_array([])
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
-
-        #plt.show()
 
         plt.savefig("./img/WPMAcc.png")
 
@@ -193,8 +186,6 @@ class GraphMaker:
         plt.xticks(bins + 0.005, [f"{value:.2f}" for value in bins])
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
-        #plt.show()
-
         plt.savefig("./img/histAcc.png")
 
     def wpmAcc(self):
@@ -221,8 +212,6 @@ class GraphMaker:
         sm.set_array([])
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Attempts')
 
-        # plt.show()
-
         plt.savefig("./img/wpmAccRace.png")
 
     def plotDailyRaces(self):
@@ -239,6 +228,5 @@ class GraphMaker:
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
-        #plt.show()
 
         plt.savefig("./img/DailyRaces.png")
