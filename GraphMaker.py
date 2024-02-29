@@ -139,17 +139,14 @@ class GraphMaker:
         return sum(map(lambda y: y[1], data))/len(data)
 
     def _plotSmooth(self, data_source, denoising_line: int = 10, label="Smooth", color="red"):
-        local_points = []
-        points = []
+        plt.plot(self.attempt, self._runningAverage(data_source, denoising_line),color=color, label=label, linewidth=1)
 
-        for attempt, data in list(reversed(list(zip(self.attempt, data_source))))[1:]:
-            local_points.append([attempt, data])
-            if len(local_points) > denoising_line:
-                local_points.pop(0)
+    def _runningAverage(self, arr, n):
+        data = np.empty(n - 1, dtype="float64")
+        for i in range(1, n):
+            np.put(data, i - 1, np.convolve(arr[:i + 1], np.ones(i) / i, mode='valid'))
 
-            points.append([attempt, GraphMaker._average(local_points)])
-
-        plt.plot(list(map(lambda x: x[0], points)), list(map(lambda x: x[1], points)), color=color, label=label, linewidth=1)
+        return np.concatenate((data, np.convolve(arr, np.ones(n) / n, mode='valid')))
 
     def _plotAverage(self, data):
         self._plotSmooth(data, len(data), label="Average", color="green")
@@ -158,7 +155,7 @@ class GraphMaker:
         pb_score = 0
         pb = []
 
-        for attempt, data in reversed(list(zip(self.attempt, data_source))):
+        for attempt, data in list(zip(self.attempt, data_source)):
             if data > pb_score:
                 pb.append([attempt, data])
                 pb_score = data
@@ -176,7 +173,7 @@ class GraphMaker:
         pb_score = data_source[-1]
         pb = [[self.attempt[-1], pb_score]]
 
-        for attempt, data in list(reversed(list(zip(self.attempt, data_source))))[1:]:
+        for attempt, data in list(zip(self.attempt, data_source))[1:]:
             if data > pb_score:
                 plt.axhline(y=pb[-1][1], color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
 
@@ -245,7 +242,7 @@ class GraphMaker:
         plt.figure()
         entries = {}
 
-        for attempt, current_date in reversed(list(zip(self.attempt, self.date))):
+        for attempt, current_date in list(zip(self.attempt, self.date)):
             if current_date in entries:
                 entries[current_date] += 1
             else:

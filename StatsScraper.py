@@ -65,7 +65,8 @@ class StatsScraper:
         return current_date
 
     def getData(self):
-        return self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date
+        data = self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date
+        return list(map(lambda d: list(reversed(d)), data))
 
     def download(self, path: str):
         with open(path, "w") as f:
