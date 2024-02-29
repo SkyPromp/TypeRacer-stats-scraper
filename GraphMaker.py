@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
+from typing import List
 
 
 class GraphMaker:
-    def __init__(self, data):
+    def __init__(self, data: List[np.ndarray]):
         self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date = data
 
     def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, denoising_line: int = 10, average_on: bool = True):
@@ -152,41 +153,29 @@ class GraphMaker:
         self._plotSmooth(data, len(data), label="Average", color="green")
 
     def _pbGradual(self, data_source, label: str = "PB"):
-        pb_score = 0
-        pb = []
+        zipped = np.column_stack((np.maximum.accumulate(data_source), self.attempt))
+        unique, index = np.unique(zipped[:, 0], axis=0, return_index=True)
 
-        for attempt, data in list(zip(self.attempt, data_source)):
-            if data > pb_score:
-                pb.append([attempt, data])
-                pb_score = data
-                plt.axhline(y=data, color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
+        pb_attempts = self.attempt[index]
+        plt.plot(pb_attempts, unique, color="black", label="PB's", linewidth=1)
 
-        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="PB's", linewidth=1)
+        total_attempts = len(self.attempt)
+
+        for attempt, pb in zip(pb_attempts, unique):
+            plt.axhline(y=pb, color="black", linestyle="--", linewidth=1, xmin=attempt / total_attempts)
 
         ax2 = plt.gca().secondary_yaxis('right')
-        ax2.set_yticks(list(map(lambda x: x[1], pb)))
+        ax2.set_yticks(unique)
         plt.subplots_adjust(right=0.85)
         ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
                        multialignment='center')
 
-    def _pbSnap(self, data_source, label: str = "PB"):
-        pb_score = data_source[-1]
-        pb = [[self.attempt[-1], pb_score]]
-
-        for attempt, data in list(zip(self.attempt, data_source))[1:]:
-            if data > pb_score:
-                plt.axhline(y=pb[-1][1], color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
-
-                pb.append([attempt, pb_score])
-                pb.append([attempt, data])
-                pb_score = data
-
-        pb.append([max(self.attempt), pb_score])
-
-        plt.plot(list(map(lambda x: x[0], pb)), list(map(lambda x: x[1], pb)), color="black", label="PB's", linewidth=1)
+    def _pbSnap(self, data_source, label: str = "PB"):  # TODO: fix (not approximating, no unique...)
+        pb = np.maximum.accumulate(data_source)
+        plt.plot(self.attempt, pb, color="black", label="PB's", linewidth=1)
 
         ax2 = plt.gca().secondary_yaxis('right')
-        ax2.set_yticks(list(map(lambda x: x[1], pb)))
+        ax2.set_yticks(np.unique(pb))
         plt.subplots_adjust(right=0.85)
         ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
                        multialignment='center')
