@@ -1,5 +1,5 @@
 from datetime import datetime
-import numpy as np
+from numpy import array
 import requests
 from bs4 import BeautifulSoup
 
@@ -54,7 +54,7 @@ class StatsScraper:
     def _toDatetime(self, current_date: str) -> datetime:
         months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
         if current_date == "today":
-            current_date = datetime.today()
+            current_date = datetime.today()  # trim microseconds
         else:
             month, day, year = current_date.split(" ")
             day = int(day[:-1])
@@ -67,7 +67,7 @@ class StatsScraper:
 
     def getData(self):
         data = self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date
-        return list(map(lambda d: np.array(list(reversed(d))), data))
+        return list(map(lambda d: array(list(reversed(d))), data))
 
     def download(self, path: str):
         with open(path, "w") as f:

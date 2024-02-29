@@ -86,8 +86,7 @@ class GraphMaker:
         else:
             s = 20
 
-        inter = list(map(lambda speed: (speed - slowest) / float(fastest_rel), self.wpm))
-        plt.scatter(self.attempt, self.accuracy, c=inter, cmap="RdYlGn", s=s)
+        plt.scatter(self.attempt, self.accuracy, c=np.interp(self.wpm, (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
@@ -110,8 +109,8 @@ class GraphMaker:
 
     def plotWPMAccCorrelation(self):
         plt.figure()
-        least = min(self.accuracy)
-        most_rel = max(self.accuracy) - least
+        least = np.amin(self.accuracy)
+        most = np.amax(self.accuracy)
         if len(self.attempt) > 6000:
             s = 1
         else:
@@ -119,8 +118,7 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
-        inter = list(map(lambda acc: (acc - least) / float(most_rel), self.accuracy))
-        plt.scatter(self.attempt, self.wpm, c=inter, cmap="RdYlGn", s=s)
+        plt.scatter(self.attempt, self.wpm, c=np.interp(self.accuracy, (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Typing Speed")
         plt.ylabel("Speed (WPM)")
@@ -140,7 +138,7 @@ class GraphMaker:
         return sum(map(lambda y: y[1], data))/len(data)
 
     def _plotSmooth(self, data_source, denoising_line: int = 10, label="Smooth", color="red"):
-        plt.plot(self.attempt, self._runningAverage(data_source, denoising_line),color=color, label=label, linewidth=1)
+        plt.plot(self.attempt, self._runningAverage(data_source, denoising_line), color=color, label=label, linewidth=1)
 
     def _runningAverage(self, arr, n):
         data = np.empty(n - 1, dtype="float64")
@@ -170,7 +168,7 @@ class GraphMaker:
         ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
                        multialignment='center')
 
-    def _pbSnap(self, data_source, label: str = "PB"):  # TODO: fix (not approximating, no unique...)
+    def _pbSnap(self, data_source, label: str = "PB"):  # TODO: fix (not approximating, no unique...) also add the axhline's back
         pb = np.maximum.accumulate(data_source)
         plt.plot(self.attempt, pb, color="black", label="PB's", linewidth=1)
 
