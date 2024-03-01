@@ -15,6 +15,9 @@ class LoadFileStats:
             for line in file:
                 attempt, wpm, accuracy, score, place, date = line.split(";")
 
+                if int(attempt) > 50000100:
+                    continue
+
                 self.wpm.append(int(wpm))
                 self.accuracy.append(float(accuracy))
                 self.attempt.append(int(attempt))

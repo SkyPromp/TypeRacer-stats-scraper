@@ -74,7 +74,7 @@ class GraphMaker:
     def plotAccWPMCorrelation(self):
         plt.figure()
         slowest = min(self.wpm)
-        fastest_rel = max(self.wpm) - slowest
+        fastest_rel = max(self.wpm)
         fig, ax = plt.subplots()
 
         if len(self.attempt) > 6000:
@@ -82,7 +82,24 @@ class GraphMaker:
         else:
             s = 20
 
-        plt.scatter(self.attempt, self.accuracy, c=np.interp(self.wpm, (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
+        if len(self.attempt) > 5e5:
+            acc = self.accuracy
+            acc_rounding = 1.01  # on the % accurate
+            acc = np.array(list(map(lambda x: round(x*1000/acc_rounding)/1000*acc_rounding, acc)))
+
+            att_rounding = 100  # sample width = 100 races
+            att = self.attempt
+            att = np.array(list(map(lambda x: round(x/att_rounding)*att_rounding, att)))
+
+            zipped = np.column_stack((acc, att))
+            uniq_zip, indices = np.unique(zipped, axis=0, return_index=True)
+            acc, att = np.split(uniq_zip, 2, axis=1)
+            acc = np.squeeze(acc)
+            att = np.squeeze(att)
+
+            plt.scatter(att, acc, c=np.interp(self.wpm[indices], (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
+        else:
+            plt.scatter(self.attempt, self.accuracy, c=np.interp(self.wpm, (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
@@ -106,6 +123,7 @@ class GraphMaker:
         plt.figure()
         least = np.amin(self.accuracy)
         most = np.amax(self.accuracy)
+
         if len(self.attempt) > 6000:
             s = 1
         else:
@@ -113,13 +131,17 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
+
+
+
+
         plt.scatter(self.attempt, self.wpm, c=np.interp(self.accuracy, (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Typing Speed")
         plt.ylabel("Speed (WPM)")
         plt.xlabel("Amount of races")
 
-        norm = mcolors.Normalize(vmin=least, vmax=max(self.accuracy))
+        norm = mcolors.Normalize(vmin=least, vmax=most)
         sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
         sm.set_array([])
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
@@ -200,8 +222,7 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
-        inter = list(map(lambda attempt_: (attempt_ - least) / float(most), self.attempt))
-        plt.scatter(self.accuracy, self.wpm, c=inter, cmap="RdYlGn", s=s)
+        plt.scatter(self.accuracy, self.wpm, c=np.interp(self.attempt, (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Speed/Accuracy")
         plt.ylabel("Speed (WPM)")
