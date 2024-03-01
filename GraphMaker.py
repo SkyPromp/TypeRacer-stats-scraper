@@ -224,14 +224,9 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
-        if len(self.attempt) > 5e5:
-            # Doesn't need to remove anything because of the amount of overlapping datapoints with this plot style
-            acc, wpm, indices = self._removeOverlapping(self.accuracy[::-1], self.wpm[::-1], 1000, 1)
-            # Flip arrays to get the most recent attempts on top
-            indices = len(self.attempt) - indices - 1
-            plt.scatter(acc, wpm, c=np.interp(self.attempt[indices], (least, most), (0, 1)), cmap="RdYlGn", s=s)
-        else:
-            plt.scatter(self.accuracy, self.wpm, c=np.interp(self.attempt, (least, most), (0, 1)), cmap="RdYlGn", s=s)
+        acc, wpm, indices = self._removeOverlapping(self.accuracy[::-1], self.wpm[::-1], 1000, 1)
+        indices = len(self.attempt) - indices - 1
+        plt.scatter(acc, wpm, c=np.interp(self.attempt[indices], (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Speed/Accuracy")
         plt.ylabel("Speed (WPM)")
