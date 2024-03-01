@@ -1,21 +1,26 @@
 # TypeRacer-stats-scraper
-Get the statistics of TypeRacer players
+Get the statistics of TypeRacer players and plot them into a dashboard.
 ## Dependencies
 beautifulsoup4  
 lxml  
 requests  
 matplotlib.pyplot  
-## Example
+## Example Code
+
 ```python
-from TypeRacer import TypeRacer
+from GraphMaker import GraphMaker
+from StatsScraper import StatsScraper
 
+ss = StatsScraper("skyprompdvorak")
+gm = GraphMaker(ss.getData())
 
-tr = TypeRacer("skyprompdvorak")
-
-tr.plotWPM(pb_smooth_on=True, denoising_line=10, average_on=True)
-tr.plotAccuracy(denoising_line=10, average_on=True)
-tr.histWPM()
-tr.histAccuracy()
+gm.plotWPM()
+gm.plotAccuracy()
+gm.plotWPMAccCorrelation()
+gm.plotAccWPMCorrelation()
+gm.plotDailyRaces()
+gm.histWPM()
+gm.histAccuracy()
 ```
-
-![img.png](img.png)
+## Result
+![img](dashboard.png)
