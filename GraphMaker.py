@@ -202,12 +202,13 @@ class GraphMaker:
         _, counts = np.unique(rounded, return_counts=True)
 
         bins = np.arange(min(rounded), 1.01, 0.01)
-        plt.hist(self.accuracy, bins=np.append(bins, 1.01))
+        plt.hist(self.accuracy, bins=np.append(np.around(bins, 2), 1.01))
 
         plt.title("Typing test accuracy distribution")
         plt.xlabel("Accuracy")
         plt.ylabel("Amount of races")
-        plt.xticks(bins + 0.005, [f"{value:.2f}" for value in bins])
+        xticks = bins[::len(bins) // 10 if len(bins) > 10 else 1]
+        plt.xticks(xticks + 0.005, [f"{value:.2f}" for value in xticks])
         plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.savefig("./img/histAcc.png")
