@@ -23,10 +23,11 @@ class GraphMaker:
         if pb_snap_on:
             self._pbSnap(self.wpm, label="PB Speeds (WPM)")
 
-        if average_grouping > 0:
-            self._plotSmooth(self.wpm, average_grouping)
         if average_on:
             self._plotAverage(self.wpm)
+
+        if average_grouping > 0:
+            self._plotSmooth(self.wpm, average_grouping)
 
         plt.xlim(1, max(self.attempt))
         plt.legend()
@@ -53,10 +54,11 @@ class GraphMaker:
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
 
-        if average_grouping > 0:
-            self._plotSmooth(self.accuracy, average_grouping=average_grouping)
         if average_on:
             self._plotAverage(self.accuracy)
+
+        if average_grouping > 0:
+            self._plotSmooth(self.accuracy, average_grouping=average_grouping)
 
         plt.xlim(1, max(self.attempt))
         plt.ylim(top=1)
@@ -161,7 +163,7 @@ class GraphMaker:
         return np.cumsum(data) / np.arange(1, len(data) + 1)
 
     def _plotAverage(self, data):
-        plt.plot(self.attempt, self._runningAverage(data), color="green", label="Average", linewidth=1)
+        plt.plot(self.attempt, self._runningAverage(data), color="lime", label="Average", linewidth=1)
 
     def _pbGradual(self, data_source, label: str = "PB"):
         zipped = np.column_stack((np.maximum.accumulate(data_source), self.attempt))
@@ -243,6 +245,9 @@ class GraphMaker:
                 entries[current_date] = 1
 
         plt.title("Total races per day")
+        plt.ylabel("Races")
+        plt.xlabel("Time (in days)")
+
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
         plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
