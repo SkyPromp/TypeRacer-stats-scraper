@@ -239,11 +239,13 @@ class GraphMaker:
         plt.figure()
         entries = {}
 
-        for attempt, current_date in list(zip(self.attempt, self.date)):
+        for current_date in self.date:
             if current_date in entries:
                 entries[current_date] += 1
             else:
                 entries[current_date] = 1
+
+        plt.bar(list(entries.keys()), list(entries.values()))
 
         plt.title("Total races per day")
         plt.ylabel("Races")
@@ -251,6 +253,6 @@ class GraphMaker:
 
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
-        plt.bar(list(map(lambda x: x[0], entries.items())), list(map(lambda x: x[1], entries.items())))
+
 
         plt.savefig("./img/DailyRaces.png")
