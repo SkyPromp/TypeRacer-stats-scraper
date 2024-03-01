@@ -83,19 +83,7 @@ class GraphMaker:
             s = 20
 
         if len(self.attempt) > 5e5:
-            acc = self.accuracy
-            acc_rounding = 1.01  # on the % accurate
-            acc = np.array(list(map(lambda x: round(x*1000/acc_rounding)/1000*acc_rounding, acc)))
-
-            att_rounding = 100  # sample width = 100 races
-            att = self.attempt
-            att = np.array(list(map(lambda x: round(x/att_rounding)*att_rounding, att)))
-
-            zipped = np.column_stack((acc, att))
-            uniq_zip, indices = np.unique(zipped, axis=0, return_index=True)
-            acc, att = np.split(uniq_zip, 2, axis=1)
-            acc = np.squeeze(acc)
-            att = np.squeeze(att)
+            att, acc, indices = self._removeOverlapping(self.attempt, self.accuracy, 1/100, 1000/1.01)
 
             plt.scatter(att, acc, c=np.interp(self.wpm[indices], (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
         else:
@@ -147,6 +135,19 @@ class GraphMaker:
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Accuracy')
 
         plt.savefig("./img/WPMAcc.png")
+
+    @staticmethod
+    def _removeOverlapping(data_x, data_y, x_threshold, y_threshold):
+        data_y = np.array(list(map(lambda x: round(x * y_threshold) / y_threshold, data_y)))
+        data_x = np.array(list(map(lambda x: round(x * x_threshold) / x_threshold, data_x)))
+
+        zipped = np.column_stack((data_y, data_x))
+        uniq_zip, indices = np.unique(zipped, axis=0, return_index=True)
+        data_y, data_x = np.split(uniq_zip, 2, axis=1)
+        data_y = np.squeeze(data_y)
+        data_x = np.squeeze(data_x)
+
+        return data_x, data_y, indices
 
     @staticmethod
     def _average(data):
