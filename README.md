@@ -14,8 +14,10 @@ from StatsScraper import StatsScraper
 ss = StatsScraper("skyprompdvorak")
 gm = GraphMaker(ss.getData())
 
-gm.plotWPM()
-gm.plotAccuracy()
+smoothing = 50
+
+gm.plotWPM(average_grouping=50)
+gm.plotAccuracy(average_grouping=50)
 gm.plotWPMAccCorrelation()
 gm.plotAccWPMCorrelation()
 gm.plotDailyRaces()
