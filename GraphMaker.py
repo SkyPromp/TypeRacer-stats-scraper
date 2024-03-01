@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
@@ -197,19 +199,15 @@ class GraphMaker:
 
     def histAccuracy(self):
         plt.figure()
-        rounded = list(map(lambda x: round(x, 2), self.accuracy))
 
-        _, counts = np.unique(rounded, return_counts=True)
-
-        bins = np.arange(min(rounded), 1.01, 0.01)
-        plt.hist(self.accuracy, bins=np.append(np.around(bins, 2), 1.01))
+        bins = np.arange(math.floor(min(self.accuracy) * 100) / 100, 1.01, 0.01)
+        plt.hist(self.accuracy, bins=np.floor(bins * 100) / 100)
 
         plt.title("Typing test accuracy distribution")
         plt.xlabel("Accuracy")
         plt.ylabel("Amount of races")
         xticks = bins[::len(bins) // 10 if len(bins) > 10 else 1]
         plt.xticks(xticks + 0.005, [f"{value:.2f}" for value in xticks])
-        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.savefig("./img/histAcc.png")
 
