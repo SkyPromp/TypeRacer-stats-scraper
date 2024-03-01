@@ -83,7 +83,7 @@ class GraphMaker:
             s = 20
 
         if len(self.attempt) > 5e5:
-            att, acc, indices = self._removeOverlapping(self.attempt, self.accuracy, 1/100, 1000/1.01)
+            att, acc, indices = self._removeOverlapping(self.attempt, self.accuracy, 1/100, 1000/1.01)  # TODO: make thresholds dynamic
 
             plt.scatter(att, acc, c=np.interp(self.wpm[indices], (slowest, fastest_rel), (0, 1)), cmap="RdYlGn", s=s)
         else:
@@ -119,11 +119,12 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
+        if len(self.attempt) > 5e5:
+            att, wpm, indices = self._removeOverlapping(self.attempt, self.wpm, 1 / 150, 1/3)  # TODO: make thresholds dynamic
 
-
-
-
-        plt.scatter(self.attempt, self.wpm, c=np.interp(self.accuracy, (least, most), (0, 1)), cmap="RdYlGn", s=s)
+            plt.scatter(att, wpm, c=np.interp(self.accuracy[indices], (least, most), (0, 1)), cmap="RdYlGn", s=s)
+        else:
+            plt.scatter(self.attempt, self.wpm, c=np.interp(self.accuracy, (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Typing Speed")
         plt.ylabel("Speed (WPM)")
@@ -223,7 +224,14 @@ class GraphMaker:
 
         fig, ax = plt.subplots()
 
-        plt.scatter(self.accuracy, self.wpm, c=np.interp(self.attempt, (least, most), (0, 1)), cmap="RdYlGn", s=s)
+        if len(self.attempt) > 5e5:
+            # Doesn't need to remove anything because of the amount of overlapping datapoints with this plot style
+            # TODO: reverse arrays to get the newest races on top (to get full colordata resolutien)
+            acc, wpm, indices = self._removeOverlapping(self.accuracy, self.wpm, 1000, 1)
+
+            plt.scatter(acc, wpm, c=np.interp(self.attempt[indices], (least, most), (0, 1)), cmap="RdYlGn", s=s)
+        else:
+            plt.scatter(self.accuracy, self.wpm, c=np.interp(self.attempt, (least, most), (0, 1)), cmap="RdYlGn", s=s)
 
         plt.title("Speed/Accuracy")
         plt.ylabel("Speed (WPM)")
