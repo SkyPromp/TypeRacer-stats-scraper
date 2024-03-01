@@ -1,4 +1,5 @@
 import math
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -138,8 +139,8 @@ class GraphMaker:
 
     @staticmethod
     def _removeOverlapping(data_x, data_y, x_threshold, y_threshold):
-        data_y = np.array(list(map(lambda x: round(x * y_threshold) / y_threshold, data_y)))
-        data_x = np.array(list(map(lambda x: round(x * x_threshold) / x_threshold, data_x)))
+        data_x = np.round(data_x * x_threshold)/x_threshold
+        data_y = np.round(data_y * y_threshold)/y_threshold
 
         zipped = np.column_stack((data_y, data_x))
         uniq_zip, indices = np.unique(zipped, axis=0, return_index=True)
