@@ -37,17 +37,13 @@ class GraphMaker:
 
     def histWPM(self):
         plt.figure()
-        unique_values, counts = np.unique(self.wpm, return_counts=True)
-        sorted_indices = np.argsort(unique_values)
-        unique_values = unique_values[sorted_indices]
-        counts = counts[sorted_indices]
 
-        plt.bar(unique_values, counts)
+        bins = np.arange(min(self.wpm), max(self.wpm), 1)
+        plt.hist(self.wpm, bins=bins)
 
         plt.title("Typing test speed distribution")
         plt.xlabel("Speed (WPM)")
         plt.ylabel("Amount of races")
-        plt.yticks(np.arange(0, max(counts) + 1, int(max(counts / (6 if max(counts) > 6 else 1)))))
 
         plt.savefig("./img/histWPM.png")
 
