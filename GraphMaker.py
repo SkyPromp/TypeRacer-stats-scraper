@@ -10,7 +10,7 @@ class GraphMaker:
     def __init__(self, data: List[np.ndarray]):
         self.wpm, self.accuracy, self.attempt, self.score, self.place, self.date = data
 
-    def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, denoising_line: int = 10, average_on: bool = True):
+    def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, average_grouping: int = 10, average_on: bool = True):
         plt.figure()
         plt.plot(self.attempt, self.wpm, label="Speed")
 
@@ -23,14 +23,13 @@ class GraphMaker:
         if pb_snap_on:
             self._pbSnap(self.wpm, label="PB Speeds (WPM)")
 
-        if denoising_line > 0:
-            self._plotSmooth(self.wpm, denoising_line)
+        if average_grouping > 0:
+            self._plotSmooth(self.wpm, average_grouping)
         if average_on:
             self._plotAverage(self.wpm)
+
         plt.xlim(1, max(self.attempt))
-
         plt.legend()
-
         plt.title("Typing Speed")
 
         plt.savefig("./img/WPM.png")
@@ -47,15 +46,15 @@ class GraphMaker:
 
         plt.savefig("./img/histWPM.png")
 
-    def plotAccuracy(self, denoising_line: int = 10, average_on: bool = True):
+    def plotAccuracy(self, average_grouping: int = 10, average_on: bool = True):
         plt.figure()
         plt.plot(self.attempt, self.accuracy, label="Accuracy")
 
         plt.ylabel("Accuracy")
         plt.xlabel("Amount of races")
 
-        if denoising_line > 0:
-            self._plotSmooth(self.accuracy, denoising_line=denoising_line)
+        if average_grouping > 0:
+            self._plotSmooth(self.accuracy, average_grouping=average_grouping)
         if average_on:
             self._plotAverage(self.accuracy)
 
@@ -152,18 +151,17 @@ class GraphMaker:
     def _average(data):
         return sum(map(lambda y: y[1], data))/len(data)
 
-    def _plotSmooth(self, data_source, denoising_line: int = 10, label="Smooth", color="red"):
-        plt.plot(self.attempt, self._runningAverage(data_source, denoising_line), color=color, label=label, linewidth=1)
+    def _plotSmooth(self, data_source, average_grouping: int = 10, label=None, color="red"):
+        plt.plot(self.attempt, self._runningAverageOfN(data_source, average_grouping), color=color, label=label if label is not None else f"Average of {average_grouping}", linewidth=1)
 
-    def _runningAverage(self, arr, n):
-        data = np.empty(n - 1, dtype="float64")
-        for i in range(1, n):
-            np.put(data, i - 1, np.convolve(arr[:i + 1], np.ones(i) / i, mode='valid'))
+    def _runningAverageOfN(self, arr, n):
+        return np.concatenate((self._runningAverage(arr[:n - 1]), np.convolve(arr, np.ones(n) / n, mode='valid')))
 
-        return np.concatenate((data, np.convolve(arr, np.ones(n) / n, mode='valid')))
+    def _runningAverage(self, data):
+        return np.cumsum(data) / np.arange(1, len(data) + 1)
 
     def _plotAverage(self, data):
-        self._plotSmooth(data, len(data), label="Average", color="green")
+        plt.plot(self.attempt, self._runningAverage(data), color="green", label="Average", linewidth=1)
 
     def _pbGradual(self, data_source, label: str = "PB"):
         zipped = np.column_stack((np.maximum.accumulate(data_source), self.attempt))
