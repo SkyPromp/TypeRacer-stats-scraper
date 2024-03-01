@@ -226,9 +226,9 @@ class GraphMaker:
 
         if len(self.attempt) > 5e5:
             # Doesn't need to remove anything because of the amount of overlapping datapoints with this plot style
-            # TODO: reverse arrays to get the newest races on top (to get full colordata resolutien)
-            acc, wpm, indices = self._removeOverlapping(self.accuracy, self.wpm, 1000, 1)
-
+            acc, wpm, indices = self._removeOverlapping(self.accuracy[::-1], self.wpm[::-1], 1000, 1)
+            # Flip arrays to get the most recent attempts on top
+            indices = len(self.attempt) - indices - 1
             plt.scatter(acc, wpm, c=np.interp(self.attempt[indices], (least, most), (0, 1)), cmap="RdYlGn", s=s)
         else:
             plt.scatter(self.accuracy, self.wpm, c=np.interp(self.attempt, (least, most), (0, 1)), cmap="RdYlGn", s=s)
