@@ -247,5 +247,4 @@ class GraphMaker:
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
 
-
         plt.savefig("./img/DailyRaces.png")
