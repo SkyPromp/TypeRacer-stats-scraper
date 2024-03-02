@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 from typing import List
 
+from collections import Counter
 
 class GraphMaker:
     def __init__(self, data: List[np.ndarray]):
@@ -234,18 +235,10 @@ class GraphMaker:
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Attempts')
 
         plt.savefig("./img/wpmAccRace.png")
-
     def plotDailyRaces(self):
         plt.figure()
-        entries = {}
 
-        for current_date in self.date:
-            if current_date in entries:
-                entries[current_date] += 1
-            else:
-                entries[current_date] = 1
-
-        plt.bar(list(entries.keys()), list(entries.values()))
+        plt.bar(*zip(*Counter(self.date).items()))  # Faster than numpy only
 
         plt.title("Total races per day")
         plt.ylabel("Races")
