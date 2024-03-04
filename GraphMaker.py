@@ -1,12 +1,10 @@
-import math
-import time
-
+from math import floor
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
 from typing import List
-
 from collections import Counter
+
 
 class GraphMaker:
     def __init__(self, data: List[np.ndarray]):
@@ -161,7 +159,8 @@ class GraphMaker:
     def _runningAverageOfN(self, arr, n):
         return np.concatenate((self._runningAverage(arr[:n - 1]), np.convolve(arr, np.ones(n) / n, mode='valid')))
 
-    def _runningAverage(self, data):
+    @staticmethod
+    def _runningAverage(data):
         return np.cumsum(data) / np.arange(1, len(data) + 1)
 
     def _plotAverage(self, data):
@@ -185,12 +184,23 @@ class GraphMaker:
         ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
                        multialignment='center')
 
-    def _pbSnap(self, data_source, label: str = "PB"):  # TODO: fix (not approximating, no unique...) also add the axhline's back
-        pb = np.maximum.accumulate(data_source)
-        plt.plot(self.attempt, pb, color="black", label="PB's", linewidth=1)
+    def _pbSnap(self, data_source, label: str = "PB"):
+        zipped = np.column_stack((np.maximum.accumulate(data_source), self.attempt))
+        unique, index = np.unique(zipped[:, 0], axis=0, return_index=True)
+
+        double = np.repeat(unique, 2)
+        index_repeat = np.concatenate(([index[0]], np.repeat(index[1:], 2), [index[-1]]))
+        pb_attempts = self.attempt[index_repeat]
+
+        plt.plot(pb_attempts, double, color="black", label="PB's", linewidth=1)
+
+        unique_indices = self.attempt[index][1:]
+
+        for attempt, pb in zip(np.append(unique_indices, unique_indices[-1]), unique):
+            plt.axhline(y=pb, color="black", linestyle="--", linewidth=1, xmin=attempt / len(self.attempt))
 
         ax2 = plt.gca().secondary_yaxis('right')
-        ax2.set_yticks(np.unique(pb))
+        ax2.set_yticks(unique)
         plt.subplots_adjust(right=0.85)
         ax2.set_ylabel(label, rotation=270, labelpad=10, ha='center', va='center_baseline',
                        multialignment='center')
@@ -198,7 +208,7 @@ class GraphMaker:
     def histAccuracy(self):
         plt.figure()
 
-        bins = np.arange(math.floor(min(self.accuracy) * 100) / 100, 1.01, 0.01)
+        bins = np.arange(floor(min(self.accuracy) * 100) / 100, 1.01, 0.01)
         plt.hist(self.accuracy, bins=np.floor(bins * 100) / 100)
 
         plt.title("Typing test accuracy distribution")
@@ -235,6 +245,7 @@ class GraphMaker:
         plt.colorbar(sm, ax=ax, orientation='vertical', label='Attempts')
 
         plt.savefig("./img/wpmAccRace.png")
+
     def plotDailyRaces(self):
         plt.figure()
 
