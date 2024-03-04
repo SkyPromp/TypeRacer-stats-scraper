@@ -12,6 +12,10 @@ class GraphMaker:
 
     def plotWPM(self, pb_smooth_on: bool = True, pb_snap_on: bool = False, average_grouping: int = 10, average_on: bool = True):
         plt.figure()
+
+        if average_grouping > len(self.attempt):
+            average_grouping = len(self.attempt)
+
         plt.plot(self.attempt, self.wpm, label="Speed")
 
         plt.ylabel("Speed (WPM)")
@@ -49,6 +53,10 @@ class GraphMaker:
 
     def plotAccuracy(self, average_grouping: int = 10, average_on: bool = True):
         plt.figure()
+
+        if average_grouping > len(self.attempt):
+            average_grouping = len(self.attempt)
+
         plt.plot(self.attempt, self.accuracy, label="Accuracy")
 
         plt.ylabel("Accuracy")
