@@ -31,7 +31,7 @@ class GraphMaker:
             self._plotAverage(self.wpm)
 
         if average_grouping > 0:
-            self._plotSmooth(self.wpm, average_grouping)
+            self._plotSmooth(self.wpm, self.attempt, average_grouping)
 
         plt.xlim(1, max(self.attempt))
         plt.legend()
@@ -66,7 +66,7 @@ class GraphMaker:
             self._plotAverage(self.accuracy)
 
         if average_grouping > 0:
-            self._plotSmooth(self.accuracy, average_grouping=average_grouping)
+            self._plotSmooth(self.accuracy, self.attempt, average_grouping=average_grouping)
 
         plt.xlim(1, max(self.attempt))
         plt.ylim(top=1)
@@ -161,8 +161,8 @@ class GraphMaker:
     def _average(data):
         return sum(map(lambda y: y[1], data))/len(data)
 
-    def _plotSmooth(self, data_source, average_grouping: int = 10, label=None, color="red"):
-        plt.plot(self.attempt, self._runningAverageOfN(data_source, average_grouping), color=color, label=label if label is not None else f"Average of {average_grouping}", linewidth=1)
+    def _plotSmooth(self, data_source, attempts, average_grouping: int = 10, label=None, color="red"):
+        plt.plot(attempts, self._runningAverageOfN(data_source, average_grouping), color=color, label=label if label is not None else f"Average of {average_grouping}", linewidth=1)
 
     def _runningAverageOfN(self, arr, n):
         return np.concatenate((self._runningAverage(arr[:n - 1]), np.convolve(arr, np.ones(n) / n, mode='valid')))
@@ -267,3 +267,38 @@ class GraphMaker:
         plt.subplots_adjust(bottom=0.2)
 
         plt.savefig("./img/DailyRaces.png")
+
+    def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False):
+        plt.figure()
+
+        self_wpm = self.wpm
+        other_wpm = other.wpm
+
+        if relative:
+            plt.xlim(0, 1)
+            plt.xlabel("Race percentage")
+            self_attempts = self.attempt/len(self.attempt)
+            other_attempts = other.attempt/len(other.attempt)
+        elif cutoff:
+            plt.xlim(1, min(len(self.attempt), len(other.attempt)))
+            plt.xlabel("Amount of races")
+            min_attempts = min(len(self.attempt), len(other.attempt))
+            self_wpm = self.wpm[:min_attempts]
+            self_attempts = self.attempt[:min_attempts]
+            other_wpm = other.wpm[:min_attempts]
+            other_attempts = other.attempt[:min_attempts]
+        else:
+            plt.xlim(1, max(np.append(self.attempt, other.attempt)))
+            plt.xlabel("Amount of races")
+            self_attempts = self.attempt
+            other_attempts = other.attempt
+
+        self._plotSmooth(self_wpm, self_attempts, average_grouping=average_grouping, label="Self", color="red")
+        self._plotSmooth(other_wpm, other_attempts, average_grouping=average_grouping, label="Other", color="blue")
+
+        plt.ylabel("Speed (WPM)")
+
+        plt.legend()
+        plt.title("Typing Speed")
+
+        plt.savefig("./img/comparison.png")
