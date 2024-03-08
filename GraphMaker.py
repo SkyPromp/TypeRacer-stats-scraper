@@ -302,3 +302,6 @@ class GraphMaker:
         plt.title("Typing Speed")
 
         plt.savefig("./img/comparison.png")
+
+    def getMaxAverageOfNIndex(self, n = 10):
+        return np.argmax(np.convolve(self.wpm, np.ones(n) / n)) - n + 1
