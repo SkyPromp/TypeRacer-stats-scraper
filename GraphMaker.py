@@ -220,10 +220,21 @@ class GraphMaker:
         plt.hist(self.accuracy, bins=np.floor(bins * 100) / 100)
 
         plt.title("Typing test accuracy distribution")
-        plt.xlabel("Accuracy")
+        plt.xlabel("Accuracy (%)")
         plt.ylabel("Amount of races")
+        bins = np.delete(bins, np.argwhere(bins > 1.005))
+
         xticks = bins[::len(bins) // 10 if len(bins) > 10 else 1]
-        plt.xticks(xticks + 0.005, [f"{value:.2f}" for value in xticks])
+        # t = 1
+        #
+        # while len(xticks) > 10:
+        #     if t > 10:
+        #         t = 1
+        #
+        #     xticks = np.delete(xticks, t)
+        #     t += 1
+
+        plt.xticks(xticks + 0.005, [f"{round(100*value)}" for value in xticks])
 
         plt.savefig("./img/histAcc.png")
 
