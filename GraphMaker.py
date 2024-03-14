@@ -216,26 +216,19 @@ class GraphMaker:
     def histAccuracy(self):
         plt.figure()
 
-        bins = np.arange(floor(min(self.accuracy) * 100) / 100, 1.01, 0.01)
-        plt.hist(self.accuracy, bins=np.floor(bins * 100) / 100)
+        bins = np.floor(np.arange(floor(min(self.accuracy) * 100) / 100, 1.011, 0.01) * 100) / 100
+        np.set_printoptions(precision=15)
+        plt.hist(self.accuracy, bins=bins)
 
+        bins = np.delete(bins, np.argwhere(bins > 1.005))
         plt.title("Typing test accuracy distribution")
         plt.xlabel("Accuracy (%)")
         plt.ylabel("Amount of races")
-        bins = np.delete(bins, np.argwhere(bins > 1.005))
 
         xticks = bins[::len(bins) // 10 if len(bins) > 10 else 1]
-        # t = 1
-        #
-        # while len(xticks) > 10:
-        #     if t > 10:
-        #         t = 1
-        #
-        #     xticks = np.delete(xticks, t)
-        #     t += 1
 
         plt.xticks(xticks + 0.005, [f"{round(100*value)}" for value in xticks])
-
+        plt.subplots_adjust(left=0.15)
         plt.savefig("./img/histAcc.png")
 
     def wpmAcc(self):
@@ -279,7 +272,7 @@ class GraphMaker:
 
         plt.savefig("./img/DailyRaces.png")
 
-    def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False):
+    def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False, self_name: str = "Self", other_name: str = "Other"):
         plt.figure()
 
         self_wpm = self.wpm
@@ -304,8 +297,8 @@ class GraphMaker:
             self_attempts = self.attempt
             other_attempts = other.attempt
 
-        self._plotSmooth(self_wpm, self_attempts, average_grouping=average_grouping, label="Self", color="red")
-        self._plotSmooth(other_wpm, other_attempts, average_grouping=average_grouping, label="Other", color="blue")
+        self._plotSmooth(self_wpm, self_attempts, average_grouping=average_grouping, label=self_name, color="red")
+        self._plotSmooth(other_wpm, other_attempts, average_grouping=average_grouping, label=other_name, color="blue")
 
         plt.ylabel("Speed (WPM)")
 
@@ -314,5 +307,7 @@ class GraphMaker:
 
         plt.savefig("./img/comparison.png")
 
-    def getMaxAverageOfNIndex(self, n = 10):
-        return np.argmax(np.convolve(self.wpm, np.ones(n) / n)) - n + 1
+    def getMaxAverageOfN(self, n: int = 10):
+        races = np.convolve(self.accuracy, np.ones(n) / n)
+        index = np.argmax(np.convolve(self.accuracy, np.ones(n) / n)) - n + 1
+        return index, races[index + n - 1]
