@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
+from math import ceil
 
 
 class WPMHistAnimator:
@@ -17,7 +18,8 @@ class WPMHistAnimator:
         self.ax.set_xlabel("Typing speed (WPM)")
         self.ax.set_ylabel("Amount of races")
 
-        self.bins = np.unique(np.floor(np.arange(min(self.wpm), max(self.wpm), (max(self.wpm) - min(self.wpm)) / 50)))  # do not step by 1 for performance reasons
+        binsize = ceil(ceil((max(self.wpm) - min(self.wpm)) / 50))
+        self.bins = np.arange(min(self.wpm), max(self.wpm), binsize)  # do not step by 1 for performance reasons
         self.fig.subplots_adjust(left=0.15)
 
     def _animate(self, i):
