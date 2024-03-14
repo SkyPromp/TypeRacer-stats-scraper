@@ -5,6 +5,11 @@ beautifulsoup4
 lxml  
 requests  
 matplotlib.pyplot  
+
+### Install requirements
+```shell
+pip install -r requirements
+```
 ## Example Code
 
 ```python
@@ -25,6 +30,7 @@ gm.histWPM()
 gm.histAccuracy()
 
 gm.animateHistAccuracy()
+gm.animateHistWPM()
 
 ss2 = StatsScraper("typeracer")
 gm2 = GraphMaker(ss2.getData())
