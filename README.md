@@ -23,6 +23,13 @@ gm.plotAccWPMCorrelation()
 gm.plotDailyRaces()
 gm.histWPM()
 gm.histAccuracy()
+
+gm.animateHistAccuracy()
+
+ss2 = StatsScraper("typeracer")
+gm2 = GraphMaker(ss2.getData())
+
+gm.overlapWPM(gm2, cutoff=True, self_name="skyprompdvorak", other_name="typeracer")
 ```
 ## Result
 ![img](dashboard.png)
