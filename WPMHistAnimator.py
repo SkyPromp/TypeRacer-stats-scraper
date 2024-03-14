@@ -18,7 +18,6 @@ class WPMHistAnimator:
         self.ax.set_ylabel("Amount of races")
 
         self.bins = np.floor(np.arange(min(self.wpm), max(self.wpm), (max(self.wpm) - min(self.wpm)) / 50))  # do not step by 1 for performance reasons
-        print(list(self.bins))
         self.fig.subplots_adjust(left=0.15)
 
     def _animate(self, i):
