@@ -316,3 +316,8 @@ class GraphMaker:
     def animateHistAccuracy(self, frame_step_size=None, duration_seconds=3):
         animator = AccuracyHistAnimator(self.accuracy)
         animator.save_animation('./img/histAccuracy.gif', frame_step_size=frame_step_size, duration_seconds=duration_seconds)
+
+    def animateHistWPM(self, frame_step_size=None, duration_seconds=3):
+        from WPMHistAnimator import WPMHistAnimator
+        animator = WPMHistAnimator(self.wpm)
+        animator.save_animation('./img/histWPM.gif', frame_step_size=frame_step_size, duration_seconds=duration_seconds)
