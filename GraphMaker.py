@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 from typing import List
 from collections import Counter
+from AccuracyHistAnimator import AccuracyHistAnimator
 
 
 class GraphMaker:
@@ -311,3 +312,7 @@ class GraphMaker:
         races = np.convolve(self.accuracy, np.ones(n) / n)
         index = np.argmax(np.convolve(self.accuracy, np.ones(n) / n)) - n + 1
         return index, races[index + n - 1]
+
+    def animateHistAccuracy(self, frame_step_size=None, duration_seconds=3):
+        animator = AccuracyHistAnimator(self.accuracy)
+        animator.save_animation('./img/histAccuracy.gif', frame_step_size=frame_step_size, duration_seconds=duration_seconds)
