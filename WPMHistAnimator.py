@@ -8,7 +8,8 @@ class WPMHistAnimator:
         self.wpm = wpm
         self.fig, self.ax = plt.subplots()
 
-        self.bins = np.arange(min(self.wpm), max(self.wpm), 1)
+        #self.bins = np.arange(min(self.wpm), max(self.wpm), 1)
+
         self.hist = None
         self.frame_step_size = None
 
@@ -16,11 +17,14 @@ class WPMHistAnimator:
         self.ax.set_xlabel("Typing speed (WPM)")
         self.ax.set_ylabel("Amount of races")
 
+        self.bins = np.floor(np.arange(min(self.wpm), max(self.wpm), (max(self.wpm) - min(self.wpm)) / 50))  # do not step by 1 for performance reasons
+        print(list(self.bins))
         self.fig.subplots_adjust(left=0.15)
 
     def _animate(self, i):
         if self.hist is not None:
             self.hist[2][0].remove()
+
         self.hist = self.ax.hist(self.wpm[:self.frame_step_size * i + 1], bins=self.bins, color="blue")  # TODO: make step_size non-linear
 
     def save_animation(self, filename, frame_step_size=None, duration_seconds=3):
