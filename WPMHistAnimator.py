@@ -32,6 +32,9 @@ class WPMHistAnimator:
         if frame_step_size is None:
             frame_step_size = len(self.wpm) // 36
 
+        if frame_step_size == 0:
+            frame_step_size = 1
+
         self.frame_step_size = frame_step_size
         max_frames = len(self.wpm) // frame_step_size
         ani = FuncAnimation(self.fig, self._animate, frames=max_frames, blit=False)
