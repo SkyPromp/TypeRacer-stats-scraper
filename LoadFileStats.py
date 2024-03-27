@@ -1,5 +1,6 @@
 from datetime import datetime
 from numpy import array
+from csv import reader
 
 
 class LoadFileStats:
@@ -11,12 +12,12 @@ class LoadFileStats:
         self.place = []
         self.date = []
 
-        with (open(filename) as file):
+        with open(filename) as file:
             for line in file:
                 attempt, wpm, accuracy, score, place, date = line.split(";")
 
-                self.wpm.append(int(wpm))
-                self.accuracy.append(float(accuracy))
+                self.wpm.append(int(wpm) * 100)
+                self.accuracy.append(int((accuracy[0] + accuracy[2:]).ljust(4, "0")))
                 self.attempt.append(int(attempt))
                 self.score.append(int(score))
                 self.place.append(place)

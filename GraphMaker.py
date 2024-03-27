@@ -70,7 +70,7 @@ class GraphMaker:
             self._plotSmooth(self.accuracy, self.attempt, average_grouping=average_grouping)
 
         plt.xlim(1, max(self.attempt))
-        plt.ylim(top=1)
+        plt.ylim(top=1000)
         plt.legend()
         ax2 = plt.gca().secondary_yaxis('right')
 
@@ -101,7 +101,7 @@ class GraphMaker:
         plt.xlabel("Amount of races")
 
         plt.xlim(1, max(self.attempt))
-        plt.ylim(top=1)
+        plt.ylim(top=1000)
         ax2 = plt.gca().secondary_yaxis('right')
         ax2.set_yticks(plt.yticks()[0])
 
@@ -262,7 +262,7 @@ class GraphMaker:
     def plotDailyRaces(self):
         plt.figure()
 
-        plt.bar(*zip(*Counter(self.date).items()))  # Faster than numpy only
+        plt.bar(*zip(*Counter(self.date).items()), width=1)  # Faster than numpy only
 
         plt.title("Total races per day")
         plt.ylabel("Races")
