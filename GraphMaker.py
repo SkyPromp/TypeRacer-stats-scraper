@@ -43,7 +43,7 @@ class GraphMaker:
     def histWPM(self):
         plt.figure()
 
-        bins = np.arange(min(self.wpm), max(self.wpm), 1)
+        bins = np.arange(min(self.wpm), max(self.wpm), 100)
         plt.hist(self.wpm, bins=bins)
 
         plt.title("Typing test speed distribution")
@@ -217,18 +217,18 @@ class GraphMaker:
     def histAccuracy(self):
         plt.figure()
 
-        bins = np.floor(np.arange(floor(min(self.accuracy) * 100) / 100, 1.011, 0.01) * 100) / 100
+        bins = np.floor(np.arange(min(self.accuracy) // 100, 1011, 10) * 100) / 100
         np.set_printoptions(precision=15)
         plt.hist(self.accuracy, bins=bins)
 
-        bins = np.delete(bins, np.argwhere(bins > 1.005))
+        bins = np.delete(bins, np.argwhere(bins > 1005))
         plt.title("Typing test accuracy distribution")
         plt.xlabel("Accuracy (%)")
         plt.ylabel("Amount of races")
 
         xticks = bins[::len(bins) // 10 if len(bins) > 10 else 1]
 
-        plt.xticks(xticks + 0.005, [f"{round(100*value)}" for value in xticks])
+        plt.xticks(xticks + 5, [f"{round(value)}" for value in xticks])
         plt.subplots_adjust(left=0.15)
         plt.savefig("./img/histAcc.png")
 
