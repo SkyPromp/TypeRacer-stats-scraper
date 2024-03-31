@@ -314,9 +314,11 @@ class GraphMaker:
         worsts.append(worst)
         averages.append(total / amount)
 
-        plt.scatter(dates, bests, color="lime", label="Best")
-        plt.scatter(dates, worsts, color="red", label="Worst")
-        plt.scatter(dates, averages, color="blue", label="Average")
+        s = 10 if len(dates) < 150 else 5
+
+        plt.scatter(dates, bests, color="lime", label="Best", s=s)
+        plt.scatter(dates, worsts, color="red", label="Worst", s=s)
+        plt.scatter(dates, averages, color="blue", label="Average", s=s)
 
         plt.title("Daily Races")
         plt.xlabel("Time (days)")
