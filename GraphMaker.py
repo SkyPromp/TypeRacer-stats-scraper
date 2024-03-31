@@ -266,12 +266,67 @@ class GraphMaker:
 
         plt.title("Total races per day")
         plt.ylabel("Races")
-        plt.xlabel("Time (in days)")
+        plt.xlabel("Time (days)")
 
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
 
         plt.savefig("./img/DailyRaces.png")
+
+    def dailyProgress(self):
+        plt.figure()
+
+        last_date = self.date[0].date()
+        best = self.wpm[0]
+        worst = self.wpm[0]
+        total = 0
+        amount = 0
+        bests = []
+        worsts = []
+        averages = []
+        dates = [self.date[0].date()]
+
+        for i, date in enumerate(self.date):
+            date = date.date()
+            wpm = self.wpm[i]
+            if date == last_date:
+                total += wpm
+                amount += 1
+
+                if wpm > best:
+                    best = wpm
+                elif wpm < worst:
+                    worst = worst
+            else:
+                last_date = date
+
+                bests.append(best)
+                worsts.append(worst)
+                averages.append(total/amount)
+                dates.append(date)
+
+                total = wpm
+                amount = 1
+                best = wpm
+                worst = wpm
+
+        bests.append(best)
+        worsts.append(worst)
+        averages.append(total / amount)
+
+        plt.plot(dates, bests, color="lime", label="Best")
+        plt.plot(dates, worsts, color="red", label="Worst")
+        plt.plot(dates, averages, color="blue", label="Average")
+
+        plt.title("Daily Overview")
+        plt.xlabel("Time (days)")
+        plt.ylabel("Speed (WPM)")
+        plt.legend()
+
+        plt.xticks(rotation=-90)
+        plt.subplots_adjust(bottom=0.3)
+
+        plt.savefig("./img/DailyOverview.png")
 
     def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False, self_name: str = "Self", other_name: str = "Other"):
         plt.figure()
