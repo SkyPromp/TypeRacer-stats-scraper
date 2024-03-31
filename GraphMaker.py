@@ -262,7 +262,7 @@ class GraphMaker:
     def plotDailyRaces(self):
         plt.figure()
 
-        plt.bar(*zip(*Counter(self.date).items()))  # Faster than numpy only
+        plt.bar(*zip(*Counter(self.date).items()), width=1)  # Faster than numpy only
 
         plt.title("Total races per day")
         plt.ylabel("Races")
