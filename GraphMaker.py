@@ -259,7 +259,7 @@ class GraphMaker:
 
         plt.savefig("./img/wpmAccRace.png")
 
-    def plotDailyRaces(self):
+    def histDailyRaceAmounts(self):
         plt.figure()
 
         plt.bar(*zip(*Counter(self.date).items()), width=1)  # Faster than numpy only
@@ -271,7 +271,7 @@ class GraphMaker:
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.2)
 
-        plt.savefig("./img/DailyRaces.png")
+        plt.savefig("./img/DailyRaceAmounts.png")
 
     def dailyProgress(self):
         plt.figure()
@@ -318,7 +318,7 @@ class GraphMaker:
         plt.plot(dates, worsts, color="red", label="Worst")
         plt.plot(dates, averages, color="blue", label="Average")
 
-        plt.title("Daily Overview")
+        plt.title("Daily Races")
         plt.xlabel("Time (days)")
         plt.ylabel("Speed (WPM)")
         plt.legend()
@@ -326,7 +326,7 @@ class GraphMaker:
         plt.xticks(rotation=-90)
         plt.subplots_adjust(bottom=0.3)
 
-        plt.savefig("./img/DailyOverview.png")
+        plt.savefig("./img/DailyRaces.png")
 
     def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False, self_name: str = "Self", other_name: str = "Other"):
         plt.figure()
