@@ -349,7 +349,6 @@ class GraphMaker:
                 plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas, label=f"{100 * key:.0f}%")
                 continue
 
-            current = np.array([])
             dts = deltas - np.insert(deltas[:-1], 0, 0)
             current = np.repeat(range(0, len(deltas)), dts)
             current = np.concatenate((current, np.repeat(current[-1], max(self.attempt) - len(current - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
