@@ -346,21 +346,11 @@ class GraphMaker:
 
         for key, values in bins.items():
             output[key] = np.array([])
-            last = 0
-            last_i = 0
 
-            for value in values:
-                last += 1
-                output[key] = np.concatenate((output[key], np.repeat(last, value - last_i)))
-                last_i = value
-
-            output[key] = np.concatenate((output[key], np.repeat(last, max(self.attempt) - last_i))) / range(min(self.attempt), max(self.attempt) + 1)
-
-#            for _ in range(min(self.attempt), max(self.attempt) + 1):
-#                if _ in values:
-#                    last += 1
-
-#                output[key].append(last / i * 100)
+            deltas = np.array(values) - 1
+            dts = deltas - np.insert(deltas[:-1], 0, 0)
+            output[key] = np.repeat(range(0, len(deltas)), dts)
+            output[key] = np.concatenate((output[key], np.repeat(output[key][-1], max(self.attempt) - len(output[key] - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
 
         for key, data in output.items():
             plt.plot(self.attempt, output[key], label=f"{100 * key:.0f}%")
