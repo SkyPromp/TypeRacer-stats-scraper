@@ -330,6 +330,47 @@ class GraphMaker:
 
         plt.savefig("./img/DailyRaces.png")
 
+    def plotAccBins(self):
+        plt.figure()
+
+        bins = {}
+        data = sorted(zip(self.attempt, np.floor(self.accuracy * 100) / 100), key=lambda x: x[0])
+
+        for i, acc in data:
+            if acc in bins:
+                bins[acc].append(i)
+            else:
+                bins[acc] = [i]
+
+        output = {}
+
+        for key, values in bins.items():
+            output[key] = np.array([])
+            last = 0
+            last_i = 0
+
+            for value in values:
+                last += 1
+                output[key] = np.concatenate((output[key], np.repeat(last, value - last_i)))
+                last_i = value
+
+            output[key] = np.concatenate((output[key], np.repeat(last, max(self.attempt) - last_i))) / range(min(self.attempt), max(self.attempt) + 1)
+
+#            for _ in range(min(self.attempt), max(self.attempt) + 1):
+#                if _ in values:
+#                    last += 1
+
+#                output[key].append(last / i * 100)
+
+        for key, data in output.items():
+            plt.plot(self.attempt, output[key], label=f"{100 * key:.0f}%")
+
+        plt.title("Accuracies Growth")
+        plt.xlabel("Total amount of races")
+        plt.ylabel("Accuracy distribution (%)")
+        plt.legend()
+        plt.savefig("./img/AccBins.png")
+
     def overlapWPM(self, other, average_grouping: int = 10, relative=False, cutoff=False, self_name: str = "Self", other_name: str = "Other"):
         plt.figure()
 
