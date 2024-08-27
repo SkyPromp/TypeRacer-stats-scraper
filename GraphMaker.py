@@ -344,7 +344,6 @@ class GraphMaker:
 
         for key, values in sorted(bins.items(), key=lambda x: -x[0]):
             deltas = np.array(values) - 1
-            print(key)
 
             if fast_mode:
                 plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas * 100, label=f"{100 * key:.0f}%")
