@@ -330,7 +330,7 @@ class GraphMaker:
 
         plt.savefig("./img/DailyRaces.png")
 
-    def plotAccBins(self):
+    def plotAccBins(self, fast_mode=False):
         plt.figure()
 
         bins = {}
@@ -342,18 +342,18 @@ class GraphMaker:
             else:
                 bins[acc] = [i]
 
-        output = {}
-
         for key, values in bins.items():
-            output[key] = np.array([])
-
             deltas = np.array(values) - 1
-            dts = deltas - np.insert(deltas[:-1], 0, 0)
-            output[key] = np.repeat(range(0, len(deltas)), dts)
-            output[key] = np.concatenate((output[key], np.repeat(output[key][-1], max(self.attempt) - len(output[key] - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
 
-        for key, data in output.items():
-            plt.plot(self.attempt, output[key], label=f"{100 * key:.0f}%")
+            if fast_mode:
+                plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas, label=f"{100 * key:.0f}%")
+                continue
+
+            current = np.array([])
+            dts = deltas - np.insert(deltas[:-1], 0, 0)
+            current = np.repeat(range(0, len(deltas)), dts)
+            current = np.concatenate((current, np.repeat(current[-1], max(self.attempt) - len(current - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
+            plt.plot(self.attempt, current, label=f"{100 * key:.0f}%")
 
         plt.title("Accuracies Growth")
         plt.xlabel("Total amount of races")
