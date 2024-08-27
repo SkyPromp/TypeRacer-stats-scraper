@@ -342,19 +342,20 @@ class GraphMaker:
             else:
                 bins[acc] = [i]
 
-        for key, values in bins.items():
+        for key, values in sorted(bins.items(), key=lambda x: -x[0]):
             deltas = np.array(values) - 1
+            print(key)
 
             if fast_mode:
-                plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas, label=f"{100 * key:.0f}%")
+                plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas * 100, label=f"{100 * key:.0f}%")
                 continue
 
             dts = deltas - np.insert(deltas[:-1], 0, 0)
             current = np.repeat(range(0, len(deltas)), dts)
             current = np.concatenate((current, np.repeat(current[-1], max(self.attempt) - len(current - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
-            plt.plot(self.attempt, current, label=f"{100 * key:.0f}%")
+            plt.plot(self.attempt, current * 100, label=f"{100 * key:.0f}%")
 
-        plt.title("Accuracies Growth")
+        plt.title("Accuracies Progression")
         plt.xlabel("Total amount of races")
         plt.ylabel("Accuracy distribution (%)")
         plt.legend()
