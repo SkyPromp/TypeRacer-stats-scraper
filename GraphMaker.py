@@ -330,7 +330,7 @@ class GraphMaker:
 
         plt.savefig("./img/DailyRaces.png")
 
-    def plotAccBins(self, fast_mode=False):
+    def plotAccBins(self):
         plt.figure()
 
         bins = {}
@@ -343,16 +343,14 @@ class GraphMaker:
                 bins[acc] = [i]
 
         for key, values in sorted(bins.items(), key=lambda x: -x[0]):
-            deltas = np.array(values) - 1
+            x = values
+            vals = np.array(range(1, len(x) + 1))
+            y = vals / values
 
-            if fast_mode:
-                plt.plot(deltas, np.array(range(1, len(deltas) + 1)) / deltas * 100, label=f"{100 * key:.0f}%")
-                continue
+            x = np.append(x, max(self.attempt))
+            y = np.append(y, vals[-1] / x[-1])
 
-            dts = deltas - np.insert(deltas[:-1], 0, 0)
-            current = np.repeat(range(0, len(deltas)), dts)
-            current = np.concatenate((current, np.repeat(current[-1], max(self.attempt) - len(current - 1)))) / range(min(self.attempt), max(self.attempt) + 1)
-            plt.plot(self.attempt, current * 100, label=f"{100 * key:.0f}%")
+            plt.plot(x, y, label=f"{100 * key:.0f}%")
 
         plt.title("Accuracies Progression")
         plt.xlabel("Total amount of races")
