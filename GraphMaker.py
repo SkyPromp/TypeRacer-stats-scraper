@@ -330,7 +330,7 @@ class GraphMaker:
 
         plt.savefig("./img/DailyRaces.png")
 
-    def plotAccBins(self):
+    def plotAccBins(self, min_acc=0):
         plt.figure()
 
         bins = {}
@@ -339,7 +339,7 @@ class GraphMaker:
         for i, acc in data:
             if acc in bins:
                 bins[acc].append(i)
-            else:
+            elif acc >= min_acc:
                 bins[acc] = [i]
 
         for key, values in sorted(bins.items(), key=lambda x: -x[0]):
@@ -350,7 +350,7 @@ class GraphMaker:
             x = np.append(x, max(self.attempt))
             y = np.append(y, vals[-1] / x[-1])
 
-            plt.plot(x, y, label=f"{100 * key:.0f}%")
+            plt.plot(x, y * 100, label=f"{100 * key:.0f}%")
 
         plt.title("Accuracies Progression")
         plt.xlabel("Total amount of races")
