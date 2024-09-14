@@ -255,7 +255,7 @@ class GraphMaker:
         norm = mcolors.Normalize(vmin=least, vmax=most)
         sm = plt.cm.ScalarMappable(cmap='RdYlGn', norm=norm)
         sm.set_array([])
-        plt.colorbar(sm, ax=ax, orientation='vertical', label='Attempts')
+        plt.colorbar(sm, ax=ax, orientation='vertical', label='Race No.')
 
         plt.savefig("./img/wpmAccRace.png")
 
